@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Registration App - Event Management System
+
+A professional event registration and management platform built with Next.js and Supabase.
+
+## Features
+
+- 🎫 Multiple ticket types
+- 🔐 Secure authentication with Supabase
+- 💳 Payment processing
+- 📱 QR code check-in
+- 📊 Real-time analytics
+- 👥 Role-based access control
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth
+- **Styling:** Tailwind CSS
+- **Language:** JavaScript
+
+## Color Scheme
+
+- **Primary:** Slate (#64748B)
+- **Secondary:** Sky Blue (#0EA5E9)
+- **Accent:** Amber (#F59E0B)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ installed
+- A Supabase account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd registration-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Supabase**
+   - Create a new project at [supabase.com](https://supabase.com)
+   - Go to Project Settings -> API
+   - Copy your Project URL and anon public key
+
+4. **Configure environment variables**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   
+   Edit `.env.local` and add your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
+
+5. **Set up database**
+   - Go to your Supabase project
+   - Navigate to SQL Editor
+   - Copy the contents of `supabase-schema.sql`
+   - Run the SQL script
+
+6. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+7. **Open your browser**
+   Visit [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+registration-app/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   └── register/
+│   ├── dashboard/
+│   ├── auth/callback/
+│   ├── globals.css
+│   ├── layout.js
+│   └── page.js
+├── lib/
+│   └── supabase/
+│       ├── client.js
+│       └── server.js
+├── middleware.js
+├── supabase-schema.sql
+└── tailwind.config.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment on Vercel
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. **Push to GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin <your-github-repo-url>
+   git push -u origin main
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Deploy to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "Import Project"
+   - Select your GitHub repository
+   - Add environment variables:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - Click "Deploy"
 
-## Learn More
+3. **Update Supabase redirect URLs**
+   - Go to Supabase Dashboard -> Authentication -> URL Configuration
+   - Add your Vercel URL to "Site URL"
+   - Add `https://your-app.vercel.app/auth/callback` to "Redirect URLs"
 
-To learn more about Next.js, take a look at the following resources:
+## Development Roadmap
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [x] Phase 1: Authentication & Basic Setup
+- [ ] Phase 2: Event Creation & Management
+- [ ] Phase 3: Ticket Types & Registration
+- [ ] Phase 4: Payment Integration
+- [ ] Phase 5: QR Code Check-in
+- [ ] Phase 6: Speaker/Staff Portals
+- [ ] Phase 7: Analytics & Reporting
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+MIT
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For support, email support@eventreg.com
