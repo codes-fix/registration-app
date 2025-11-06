@@ -12,6 +12,8 @@ module.exports = {
         // Green, Gold & Burgundy Theme
         primary: {
           DEFAULT: '#22C55E', // green-500
+          dark: '#16A34A',
+          light: '#4ADE80',
           50: '#F0FDF4',
           100: '#DCFCE7',
           200: '#BBF7D0',
@@ -25,6 +27,8 @@ module.exports = {
         },
         secondary: {
           DEFAULT: '#EAB308', // yellow-500 (gold)
+          dark: '#CA8A04',
+          light: '#FACC15',
           50: '#FEFCE8',
           100: '#FEF9C3',
           200: '#FEF08A',
@@ -38,6 +42,8 @@ module.exports = {
         },
         accent: {
           DEFAULT: '#991B1B', // red-800 (burgundy)
+          dark: '#7F1D1D',
+          light: '#B91C1C',
           50: '#FEF2F2',
           100: '#FEE2E2',
           200: '#FECACA',
@@ -49,16 +55,9 @@ module.exports = {
           800: '#991B1B',
           900: '#7F1D1D',
         },
-        success: '#10B981', // emerald-500
-        warning: '#F59E0B', // amber-500
-        error: '#EF4444', // red-500
-        info: '#0EA5E9', // sky-500
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },
   plugins: [],
 }
+         
