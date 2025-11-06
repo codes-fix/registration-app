@@ -41,11 +41,11 @@ export default function LoginPage() {
               variables: {
                 default: {
                   colors: {
-                    brand: '#0EA5E9',
-                    brandAccent: '#0284C7',
+                    brand: '#22C55E',
+                    brandAccent: '#16A34A',
                     brandButtonText: 'white',
-                    defaultButtonBackground: '#64748B',
-                    defaultButtonBackgroundHover: '#475569',
+                    defaultButtonBackground: '#EAB308',
+                    defaultButtonBackgroundHover: '#CA8A04',
                   },
                 },
               },
