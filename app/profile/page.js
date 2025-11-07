@@ -272,7 +272,99 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+            {/* Account Type & Role */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Settings</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Current Role
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role || profile?.role || 'attendee'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                    className="input"
+                  >
+                    <option value="attendee">Event Attendee</option>
+                    <option value="speaker">Speaker</option>
+                    <option value="staff">Staff Member</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="guest">Guest</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Your role determines your dashboard and available features
+                  </p>
+                </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Account Status
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      profile?.is_active 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {profile?.is_active ? '● Active' : '● Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Profile Visibility */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Privacy Settings</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Public Profile
+                    </label>
+                    <p className="text-sm text-gray-500">
+                      Allow others to view your profile information
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Show Email
+                    </label>
+                    <p className="text-sm text-gray-500">
+                      Display email on your public profile
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Show Phone
+                    </label>
+                    <p className="text-sm text-gray-500">
+                      Display phone number on your public profile
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                </div>
+              </div>
+            </div>
             {/* Preferences */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Preferences & Needs</h3>

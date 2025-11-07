@@ -9,14 +9,27 @@ import Link from 'next/link'
 
 export default function RegisterPage() {
   const [user, setUser] = useState(null)
+  const [error, setError] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
-        router.push('/dashboard')
+        
+        // Check if profile exists
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        if (!profile || !profile.first_name) {
+          router.push('/profile/setup')
+        } else {
+          router.push('/dashboard')
+        }
       }
     })
 
@@ -32,6 +45,12 @@ export default function RegisterPage() {
           </Link>
           <p className="text-slate-600">Create your account</p>
         </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
 
         <div className="card p-8">
           <Auth
@@ -51,9 +70,22 @@ export default function RegisterPage() {
                 },
               },
             }}
-            providers={['google', 'github']}
+            providers={['google']}
             redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined}
+            showLinks={true}
           />
+        </div>
+
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">
+            What happens after signup?
+          </h3>
+          <ul className="text-xs text-blue-800 space-y-1">
+            <li>✓ Verify your email address</li>
+            <li>✓ Complete your profile</li>
+            <li>✓ Choose your role (Attendee, Speaker, etc.)</li>
+            <li>✓ Start browsing events</li>
+          </ul>
         </div>
 
         <p className="text-center mt-6 text-slate-600">

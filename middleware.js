@@ -57,12 +57,19 @@ export async function middleware(request) {
   // Get session and user data
   const { data: { user }, error } = await supabase.auth.getUser()
 
-  // Protected routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/events/create', '/admin', '/speaker', '/staff']
-  const adminRoutes = ['/admin']
-  const speakerRoutes = ['/speaker']
-  const staffRoutes = ['/staff']
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/login', '/register', '/auth/callback', '/verify-email']
+  const isPublicRoute = publicRoutes.some(route => 
+    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith('/auth/')
+  )
 
+  // Allow access to public routes
+  if (isPublicRoute) {
+    return response
+  }
+
+  // Protected routes that require authentication
+  const protectedRoutes = ['/dashboard', '/profile', '/events/create', '/admin', '/speaker', '/staff', '/settings']
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
   )
@@ -76,19 +83,30 @@ export async function middleware(request) {
 
   // If user is authenticated, get their profile and role
   if (user && isProtectedRoute) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select('role, is_active')
+      .select('role, is_active, first_name')
       .eq('id', user.id)
       .single()
 
+    // If profile doesn't exist or is incomplete, redirect to profile setup
+    if (!profile || !profile.first_name) {
+      if (request.nextUrl.pathname !== '/profile/setup') {
+        return NextResponse.redirect(new URL('/profile/setup', request.url))
+      }
+      return response
+    }
+
     // Check if user account is active
-    if (!profile?.is_active) {
+    if (profile && profile.is_active === false) {
       return NextResponse.redirect(new URL('/account-suspended', request.url))
     }
 
     // Role-based route protection
     const userRole = profile?.role
+    const adminRoutes = ['/admin']
+    const speakerRoutes = ['/speaker']
+    const staffRoutes = ['/staff']
 
     // Admin routes
     if (adminRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
@@ -117,6 +135,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

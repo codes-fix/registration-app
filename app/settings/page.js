@@ -272,6 +272,80 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
+            
+            {/* Account Management */}
+            <div className="border-t pt-8">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Management</h3>
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Email Verification</h4>
+                  {user?.email_confirmed_at ? (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-600">✓</span>
+                      <span className="text-sm text-gray-600">Email verified</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-yellow-600">⚠</span>
+                        <span className="text-sm text-gray-600">Email not verified</span>
+                      </div>
+                      <Link
+                        href="/verify-email"
+                        className="text-sm text-primary hover:text-primary-600 font-medium"
+                      >
+                        Verify your email →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Two-Factor Authentication</h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Add an extra layer of security to your account
+                  </p>
+                  <button className="text-sm text-primary hover:text-primary-600 font-medium">
+                    Enable 2FA →
+                  </button>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Download Your Data</h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Request a copy of your account data
+                  </p>
+                  <button className="text-sm text-primary hover:text-primary-600 font-medium">
+                    Request Data →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Delete Account */}
+            <div className="border-t pt-8">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium text-red-900 mb-1">Delete Account</h4>
+                    <p className="text-sm text-red-700">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                        // Handle account deletion
+                        alert('Account deletion functionality would be implemented here')
+                      }
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ml-4 whitespace-nowrap"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Messages */}
             {message && (
