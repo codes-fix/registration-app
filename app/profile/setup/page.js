@@ -12,7 +12,7 @@ export default function ProfileSetupPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-
+ 
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
