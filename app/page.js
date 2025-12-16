@@ -27,7 +27,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-red-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-green-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <Link href="/">
