@@ -126,7 +126,7 @@ export default function SpeakerDashboard({ user, profile }) {
                       </p>
                       {engagement.presentation_title && (
                         <p className="text-sm text-primary mt-1">
-                          "{engagement.presentation_title}"
+                          &quot;{engagement.presentation_title}&quot;
                         </p>
                       )}
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-2 ${

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import DashboardLayout from './DashboardLayout'
 import StatsCard from './StatsCard'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 export default function AttendeeDashboard({ user, profile }) {
   const [stats, setStats] = useState({
@@ -148,12 +149,12 @@ export default function AttendeeDashboard({ user, profile }) {
           ) : (
             <div className="p-6 text-center">
               <p className="text-gray-500 mb-4">No registrations yet</p>
-              <a 
+              <Link 
                 href="/events" 
                 className="btn-primary inline-flex items-center"
               >
                 Browse Events
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -163,12 +164,12 @@ export default function AttendeeDashboard({ user, profile }) {
           <div className="bg-white rounded-lg shadow-sm p-6 border border-green-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <a href="/events" className="block w-full btn-primary text-center">
+              <Link href="/events" className="block w-full btn-primary text-center">
                 Find Events
-              </a>
-              <a href="/profile" className="block w-full btn-outline text-center">
+              </Link>
+              <Link href="/profile" className="block w-full btn-outline text-center">
                 Update Profile
-              </a>
+              </Link>
             </div>
           </div>
 

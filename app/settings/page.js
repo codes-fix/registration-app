@@ -221,7 +221,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="text-sm font-medium text-gray-700">Event Reminders</label>
-                    <p className="text-sm text-gray-500">Get reminded about upcoming events you're registered for</p>
+                    <p className="text-sm text-gray-500">Get reminded about upcoming events you&apos;re registered for</p>
                   </div>
                   <input
                     type="checkbox"

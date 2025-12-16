@@ -68,7 +68,7 @@ export default function VerifyEmailPage() {
             Verify Your Email
           </h1>
           <p className="text-gray-600 mb-6">
-            We've sent a verification email to:
+            We&apos;ve sent a verification email to:
             <br />
             <strong>{user?.email}</strong>
           </p>
@@ -98,7 +98,7 @@ export default function VerifyEmailPage() {
           </button>
 
           <div className="text-sm text-gray-600">
-            <p>Didn't receive the email? Check your spam folder.</p>
+            <p>Didn&apos;t receive the email? Check your spam folder.</p>
             <Link href="/support" className="text-primary hover:text-primary-600 font-medium">
               Need help?
             </Link>

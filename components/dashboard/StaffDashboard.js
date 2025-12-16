@@ -211,7 +211,7 @@ export default function StaffDashboard({ user, profile }) {
         {/* Upcoming schedule preview */}
         <div className="bg-white rounded-lg shadow-sm border border-green-100">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Today's Schedule</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Today&apos;s Schedule</h3>
           </div>
           <div className="p-6">
             {assignments.filter(a => {
