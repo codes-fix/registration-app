@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { getCurrentUser, updatePassword, signOut } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
@@ -19,11 +20,7 @@ export default function SettingsPage() {
     confirmPassword: ''
   })
 
-  useEffect(() => {
-    loadUser()
-  }, [])
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
       const currentUser = await getCurrentUser()
       if (!currentUser) {
@@ -37,7 +34,11 @@ export default function SettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    loadUser()
+  }, [loadUser])
 
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target
