@@ -419,7 +419,7 @@ export default function EventDetailsPage() {
 
                   {!user && (
                     <p className="text-xs text-gray-500 text-center">
-                      You'll need to sign in to complete registration
+                      You&apos;ll need to sign in to complete registration
                     </p>
                   )}
                 </div>

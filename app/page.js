@@ -72,7 +72,7 @@ export default function HomePage() {
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Streamline your event registration process with our comprehensive platform. 
-            From attendee management to speaker portals, we've got you covered.
+            From attendee management to speaker portals, we&apos;ve got you covered.
           </p>
           
           {!user && (
