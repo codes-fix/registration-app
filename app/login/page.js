@@ -8,60 +8,75 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 function LoginForm() {
-  const [user, setUser] = useState(null)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
-    // Check for error in URL
     const errorParam = searchParams.get('error')
-    if (errorParam === 'auth_failed') {
-      setError('Authentication failed. Please try again.')
-    } else if (errorParam === 'callback_failed') {
-      setError('Login callback failed. Please try again.')
+    if (errorParam) {
+      // Schedule setState to avoid cascading renders
+      setTimeout(() => setError('Authentication failed. Please try again.'), 0)
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        setUser(session.user)
+        setLoading(true)
         
-        // Check if profile exists
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single()
+          .maybeSingle()
 
         if (!profile || !profile.first_name) {
           router.push('/profile/setup')
         } else {
           router.push('/dashboard')
         }
+        
+        setLoading(false)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [router, supabase.auth, searchParams])
+  }, [router, supabase, searchParams])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-green-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-primary mb-2 cursor-pointer">EventReg</h1>
+            <div className="inline-flex items-center justify-center mb-6 cursor-pointer group">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <span className="text-4xl">🎫</span>
+              </div>
+            </div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-3">EventReg</h1>
           </Link>
-          <p className="text-slate-600">Sign in to your account</p>
+          <p className="text-gray-600 text-lg">Welcome back! Sign in to continue</p>
         </div>
 
+        {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
             <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
 
-        <div className="card p-8">
+        {/* Login Card */}
+        <div className="card p-8 shadow-2xl">
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -72,25 +87,26 @@ function LoginForm() {
                     brand: '#22C55E',
                     brandAccent: '#16A34A',
                     brandButtonText: 'white',
-                    defaultButtonBackground: '#EAB308',
-                    defaultButtonBackgroundHover: '#CA8A04',
                   },
                 },
               },
             }}
-            providers={['google']}
-            redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined}
+            providers={['google', 'facebook']}
+            redirectTo={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/auth/callback`}
             showLinks={true}
             view="sign_in"
           />
         </div>
 
-        <p className="text-center mt-6 text-slate-600">
-          Don't have an account?{' '}
-          <Link href="/register" className="text-secondary font-semibold hover:underline">
-            Sign up
-          </Link>
-        </p>
+        {/* Sign Up Link */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-secondary font-bold hover:underline">
+              Create free account →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -99,11 +115,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
       <LoginForm />
