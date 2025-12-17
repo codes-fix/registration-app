@@ -3,56 +3,73 @@
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function RegisterPage() {
-  const [user, setUser] = useState(null)
+function RegisterForm() {
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user)
+        setLoading(true)
         
-        // Check if profile exists
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single()
+          .maybeSingle()
 
         if (!profile || !profile.first_name) {
           router.push('/profile/setup')
         } else {
           router.push('/dashboard')
         }
+        
+        setLoading(false)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [router, supabase.auth])
+  }, [router, supabase])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-green-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
           <Link href="/">
-            <h1 className="text-3xl font-bold text-primary mb-2 cursor-pointer">EventReg</h1>
+            <div className="inline-flex items-center justify-center mb-6 cursor-pointer group">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <span className="text-4xl">🎫</span>
+              </div>
+            </div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-3">EventReg</h1>
           </Link>
-          <p className="text-slate-600">Create your account</p>
+          <p className="text-gray-600 text-lg">Create your free account</p>
         </div>
 
+        {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
             <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
 
-        <div className="card p-8">
+        {/* Registration Card */}
+        <div className="card p-8 shadow-2xl">
           <Auth
             supabaseClient={supabase}
             view="sign_up"
@@ -61,40 +78,37 @@ export default function RegisterPage() {
               variables: {
                 default: {
                   colors: {
-                    brand: '#0EA5E9',
-                    brandAccent: '#0284C7',
+                    brand: '#22C55E',
+                    brandAccent: '#16A34A',
                     brandButtonText: 'white',
-                    defaultButtonBackground: '#64748B',
-                    defaultButtonBackgroundHover: '#475569',
                   },
                 },
               },
             }}
             providers={['google']}
-            redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined}
+            redirectTo={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/auth/callback`}
             showLinks={true}
           />
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="text-sm font-semibold text-blue-900 mb-2">
-            What happens after signup?
-          </h3>
-          <ul className="text-xs text-blue-800 space-y-1">
-            <li>✓ Verify your email address</li>
-            <li>✓ Complete your profile</li>
-            <li>✓ Choose your role (Attendee, Speaker, etc.)</li>
-            <li>✓ Start browsing events</li>
-          </ul>
+        {/* Sign In Link */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <Link href="/login" className="text-secondary font-bold hover:underline">
+              Sign in →
+            </Link>
+          </p>
         </div>
-
-        <p className="text-center mt-6 text-slate-600">
-          Already have an account?{' '}
-          <Link href="/login" className="text-secondary font-semibold hover:underline">
-            Sign in
-          </Link>
-        </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   )
 }

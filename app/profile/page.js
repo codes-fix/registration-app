@@ -21,13 +21,7 @@ export default function ProfilePage() {
     company: '',
     job_title: '',
     bio: '',
-    dietary_restrictions: [],
-    accessibility_needs: [],
-    emergency_contact_name: '',
-    emergency_contact_phone: '',
-    linkedin_url: '',
-    twitter_handle: '',
-    website_url: ''
+    role: 'attendee'
   })
 
   useEffect(() => {
@@ -54,13 +48,7 @@ export default function ProfilePage() {
           company: userProfile.company || '',
           job_title: userProfile.job_title || '',
           bio: userProfile.bio || '',
-          dietary_restrictions: userProfile.dietary_restrictions || [],
-          accessibility_needs: userProfile.accessibility_needs || [],
-          emergency_contact_name: userProfile.emergency_contact_name || '',
-          emergency_contact_phone: userProfile.emergency_contact_phone || '',
-          linkedin_url: userProfile.linkedin_url || '',
-          twitter_handle: userProfile.twitter_handle || '',
-          website_url: userProfile.website_url || ''
+          role: userProfile.role || 'attendee'
         })
       }
     } catch (err) {
@@ -79,14 +67,6 @@ export default function ProfilePage() {
     }))
   }
 
-  const handleArrayInputChange = (field, value) => {
-    const items = value.split(',').map(item => item.trim()).filter(item => item)
-    setFormData(prev => ({
-      ...prev,
-      [field]: items
-    }))
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
@@ -96,6 +76,7 @@ export default function ProfilePage() {
     try {
       await updateUserProfile(user.id, formData)
       setMessage('Profile updated successfully!')
+      setTimeout(() => setMessage(''), 3000)
     } catch (err) {
       setError('Failed to update profile')
       console.error('Profile update error:', err)
@@ -106,184 +87,149 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
         <LoadingSpinner />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-semibold text-gray-900">User Profile</h1>
-            <p className="text-gray-600">Manage your personal information and preferences</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+      
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center text-gray-600 hover:text-primary mb-6 transition-colors"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
+          <div className="px-8 py-6 border-b border-gray-200">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">User Profile</h1>
+                <p className="text-gray-600">Manage your personal information</p>
+              </div>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="label">First Name *</label>
+                  <input
+                    type="text"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleInputChange}
+                    required
+                    className="input"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name *
-                </label>
-                <input
-                  type="text"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+                <div>
+                  <label className="label">Last Name *</label>
+                  <input
+                    type="text"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleInputChange}
+                    required
+                    className="input"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
-                />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-              </div>
+                <div>
+                  <label className="label">Email Address</label>
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="input bg-gray-100 text-gray-500 cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                <div>
+                  <label className="label">Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="input"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Professional Information */}
             <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Professional Information</h3>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Professional Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Company
-                  </label>
+                  <label className="label">Company/Organization</label>
                   <input
                     type="text"
                     name="company"
                     value={formData.company}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
+                    placeholder="Your Company"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Job Title
-                  </label>
+                  <label className="label">Job Title</label>
                   <input
                     type="text"
                     name="job_title"
                     value={formData.job_title}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
+                    placeholder="Your Position"
                   />
                 </div>
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bio
-                </label>
+                <label className="label">Bio</label>
                 <textarea
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="input"
                   placeholder="Tell us about yourself..."
                 />
               </div>
             </div>
 
-            {/* Social Media */}
+            {/* Account Role */}
             <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Social Media</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    LinkedIn URL
-                  </label>
-                  <input
-                    type="url"
-                    name="linkedin_url"
-                    value={formData.linkedin_url}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="https://linkedin.com/in/..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Twitter Handle
-                  </label>
-                  <input
-                    type="text"
-                    name="twitter_handle"
-                    value={formData.twitter_handle}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="@username"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Website URL
-                  </label>
-                  <input
-                    type="url"
-                    name="website_url"
-                    value={formData.website_url}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Account Type & Role */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Settings</h3>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Settings</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Role
-                  </label>
+                  <label className="label">Current Role</label>
                   <select
                     name="role"
-                    value={formData.role || profile?.role || 'attendee'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                    value={formData.role}
+                    onChange={handleInputChange}
                     className="input"
                   >
                     <option value="attendee">Event Attendee</option>
@@ -293,163 +239,87 @@ export default function ProfilePage() {
                     <option value="guest">Guest</option>
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
-                    Your role determines your dashboard and available features
+                    Your role determines your dashboard features
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Account Status
-                  </label>
+                  <label className="label">Account Status</label>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    <span className={`px-4 py-2 rounded-lg text-sm font-medium ${
                       profile?.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-primary-100 text-primary-800' 
+                        : 'bg-accent-100 text-accent-800'
                     }`}>
-                      {profile?.is_active ? '● Active' : '● Inactive'}
+                      {profile?.is_active ? (
+                        <span className="flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Active
+                        </span>
+                      ) : (
+                        <span className="flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          Inactive
+                        </span>
+                      )}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Profile Visibility */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Privacy Settings</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Public Profile
-                    </label>
-                    <p className="text-sm text-gray-500">
-                      Allow others to view your profile information
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Show Email
-                    </label>
-                    <p className="text-sm text-gray-500">
-                      Display email on your public profile
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Show Phone
-                    </label>
-                    <p className="text-sm text-gray-500">
-                      Display phone number on your public profile
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Preferences */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Preferences & Needs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Dietary Restrictions
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.dietary_restrictions.join(', ')}
-                    onChange={(e) => handleArrayInputChange('dietary_restrictions', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Vegetarian, Gluten-free, etc. (comma separated)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Accessibility Needs
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.accessibility_needs.join(', ')}
-                    onChange={(e) => handleArrayInputChange('accessibility_needs', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Wheelchair access, Sign language, etc. (comma separated)"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Emergency Contact */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Emergency Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Emergency Contact Name
-                  </label>
-                  <input
-                    type="text"
-                    name="emergency_contact_name"
-                    value={formData.emergency_contact_name}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Emergency Contact Phone
-                  </label>
-                  <input
-                    type="tel"
-                    name="emergency_contact_phone"
-                    value={formData.emergency_contact_phone}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Messages */}
             {message && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                <p className="text-sm text-green-800">{message}</p>
+              <div className="bg-primary-50 border-l-4 border-primary rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-primary-800 font-medium">{message}</p>
+                </div>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-sm text-red-800">{error}</p>
+              <div className="bg-accent-50 border-l-4 border-accent rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-accent-800 font-medium">{error}</p>
+                </div>
               </div>
             )}
 
             {/* Submit Button */}
-            <div className="border-t pt-6 flex justify-end">
+            <div className="border-t pt-6 flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {saving ? 'Saving...' : 'Save Profile'}
+                {saving ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </span>
+                ) : (
+                  'Save Profile'
+                )}
               </button>
             </div>
           </form>

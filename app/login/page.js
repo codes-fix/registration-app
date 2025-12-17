@@ -91,7 +91,7 @@ function LoginForm() {
                 },
               },
             }}
-            providers={['google', 'facebook']}
+            providers={['google']}
             redirectTo={`${process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/auth/callback`}
             showLinks={true}
             view="sign_in"

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { getCurrentUser, updatePassword, signOut } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+
 
 export default function SettingsPage() {
   const [user, setUser] = useState(null)
@@ -15,12 +15,27 @@ export default function SettingsPage() {
   const router = useRouter()
 
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
 
-  const loadUser = useCallback(async () => {
+  const [notifications, setNotifications] = useState({
+    email: true,
+    eventReminders: true,
+    marketing: false
+  })
+
+  const [privacy, setPrivacy] = useState({
+    profileVisible: true,
+    showEmail: false,
+    showPhone: false
+  })
+
+  useEffect(() => {
+    loadUser()
+  }, [])
+
+  const loadUser = async () => {
     try {
       const currentUser = await getCurrentUser()
       if (!currentUser) {
@@ -34,11 +49,7 @@ export default function SettingsPage() {
     } finally {
       setLoading(false)
     }
-  }, [router])
-
-  useEffect(() => {
-    loadUser()
-  }, [loadUser])
+  }
 
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target
@@ -69,11 +80,8 @@ export default function SettingsPage() {
     try {
       await updatePassword(passwordForm.newPassword)
       setMessage('Password updated successfully!')
-      setPasswordForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      })
+      setPasswordForm({ newPassword: '', confirmPassword: '' })
+      setTimeout(() => setMessage(''), 3000)
     } catch (err) {
       setError('Failed to update password')
       console.error('Password update error:', err)
@@ -94,52 +102,80 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
         <LoadingSpinner />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-semibold text-gray-900">Account Settings</h1>
-            <p className="text-gray-600">Manage your account security and preferences</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center text-gray-600 hover:text-primary mb-6 transition-colors"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+
+        {/* Settings Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
+          <div className="px-8 py-6 border-b border-gray-200">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
+                <p className="text-gray-600">Manage your account security and preferences</p>
+              </div>
+            </div>
           </div>
 
-          <div className="p-6 space-y-8">
+          <div className="p-8 space-y-8">
             {/* Account Information */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email Address</label>
-                    <p className="text-sm text-gray-900 mt-1">{user?.email}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <p className="text-sm text-gray-900">{user?.email}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Account Created</label>
-                    <p className="text-sm text-gray-900 mt-1">
-                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                    <p className="text-sm text-gray-900">
+                      {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) : 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Last Sign In</label>
-                    <p className="text-sm text-gray-900 mt-1">
-                      {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Email Verified</label>
-                    <p className="text-sm text-gray-900 mt-1">
-                      {user?.email_confirmed_at ? (
-                        <span className="text-green-600">✓ Verified</span>
-                      ) : (
-                        <span className="text-red-600">✗ Not Verified</span>
-                      )}
-                    </p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Verified</label>
+                    {user?.email_confirmed_at ? (
+                      <span className="inline-flex items-center text-sm text-primary-700">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center text-sm text-accent-700">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        Not Verified
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -147,26 +183,10 @@ export default function SettingsPage() {
 
             {/* Password Update */}
             <div className="border-t pt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
               <form onSubmit={handlePasswordUpdate} className="space-y-4 max-w-md">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Password
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    New Password
-                  </label>
+                  <label className="label">New Password</label>
                   <input
                     type="password"
                     name="newPassword"
@@ -174,14 +194,13 @@ export default function SettingsPage() {
                     onChange={handlePasswordInputChange}
                     required
                     minLength={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
+                    placeholder="Enter new password"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirm New Password
-                  </label>
+                  <label className="label">Confirm New Password</label>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -189,14 +208,15 @@ export default function SettingsPage() {
                     onChange={handlePasswordInputChange}
                     required
                     minLength={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
+                    placeholder="Confirm new password"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={updating}
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-600 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {updating ? 'Updating...' : 'Update Password'}
                 </button>
@@ -205,174 +225,129 @@ export default function SettingsPage() {
 
             {/* Notifications Settings */}
             <div className="border-t pt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Email Notifications</label>
-                    <p className="text-sm text-gray-500">Receive updates about events and registrations</p>
+                    <div className="font-medium text-gray-900">Email Notifications</div>
+                    <div className="text-sm text-gray-600">Receive updates about events and registrations</div>
                   </div>
                   <input
                     type="checkbox"
-                    defaultChecked
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    checked={notifications.email}
+                    onChange={(e) => setNotifications({...notifications, email: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
                   />
-                </div>
+                </label>
 
-                <div className="flex items-center justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Event Reminders</label>
-                    <p className="text-sm text-gray-500">Get reminded about upcoming events you&apos;re registered for</p>
+                    <div className="font-medium text-gray-900">Event Reminders</div>
+                    <div className="text-sm text-gray-600">Get reminded about upcoming events</div>
                   </div>
                   <input
                     type="checkbox"
-                    defaultChecked
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    checked={notifications.eventReminders}
+                    onChange={(e) => setNotifications({...notifications, eventReminders: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
                   />
-                </div>
+                </label>
 
-                <div className="flex items-center justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Marketing Emails</label>
-                    <p className="text-sm text-gray-500">Receive promotional content and special offers</p>
+                    <div className="font-medium text-gray-900">Marketing Emails</div>
+                    <div className="text-sm text-gray-600">Receive promotional content and special offers</div>
                   </div>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    checked={notifications.marketing}
+                    onChange={(e) => setNotifications({...notifications, marketing: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
                   />
-                </div>
+                </label>
               </div>
             </div>
 
             {/* Privacy Settings */}
             <div className="border-t pt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Privacy Settings</h3>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Privacy Settings</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Profile Visibility</label>
-                    <p className="text-sm text-gray-500">Allow other attendees to see your profile</p>
+                    <div className="font-medium text-gray-900">Profile Visibility</div>
+                    <div className="text-sm text-gray-600">Allow other attendees to see your profile</div>
                   </div>
                   <input
                     type="checkbox"
-                    defaultChecked
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    checked={privacy.profileVisible}
+                    onChange={(e) => setPrivacy({...privacy, profileVisible: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
                   />
-                </div>
+                </label>
 
-                <div className="flex items-center justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Contact Information</label>
-                    <p className="text-sm text-gray-500">Show your email and phone to event organizers</p>
+                    <div className="font-medium text-gray-900">Show Email</div>
+                    <div className="text-sm text-gray-600">Display email on your public profile</div>
                   </div>
                   <input
                     type="checkbox"
-                    defaultChecked
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    checked={privacy.showEmail}
+                    onChange={(e) => setPrivacy({...privacy, showEmail: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
                   />
-                </div>
-              </div>
-            </div>
-            
-            {/* Account Management */}
-            <div className="border-t pt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Account Management</h3>
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Email Verification</h4>
-                  {user?.email_confirmed_at ? (
-                    <div className="flex items-center space-x-2">
-                      <span className="text-green-600">✓</span>
-                      <span className="text-sm text-gray-600">Email verified</span>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-yellow-600">⚠</span>
-                        <span className="text-sm text-gray-600">Email not verified</span>
-                      </div>
-                      <Link
-                        href="/verify-email"
-                        className="text-sm text-primary hover:text-primary-600 font-medium"
-                      >
-                        Verify your email →
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                </label>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Two-Factor Authentication</h4>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Add an extra layer of security to your account
-                  </p>
-                  <button className="text-sm text-primary hover:text-primary-600 font-medium">
-                    Enable 2FA →
-                  </button>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Download Your Data</h4>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Request a copy of your account data
-                  </p>
-                  <button className="text-sm text-primary hover:text-primary-600 font-medium">
-                    Request Data →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Delete Account */}
-            <div className="border-t pt-8">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-start justify-between">
+                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                   <div>
-                    <h4 className="text-sm font-medium text-red-900 mb-1">Delete Account</h4>
-                    <p className="text-sm text-red-700">
-                      Permanently delete your account and all associated data. This action cannot be undone.
-                    </p>
+                    <div className="font-medium text-gray-900">Show Phone</div>
+                    <div className="text-sm text-gray-600">Display phone number on your public profile</div>
                   </div>
-                  <button
-                    onClick={() => {
-                      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                        // Handle account deletion
-                        alert('Account deletion functionality would be implemented here')
-                      }
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ml-4 whitespace-nowrap"
-                  >
-                    Delete Account
-                  </button>
-                </div>
+                  <input
+                    type="checkbox"
+                    checked={privacy.showPhone}
+                    onChange={(e) => setPrivacy({...privacy, showPhone: e.target.checked})}
+                    className="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                </label>
               </div>
             </div>
 
             {/* Messages */}
             {message && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                <p className="text-sm text-green-800">{message}</p>
+              <div className="bg-primary-50 border-l-4 border-primary rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-primary mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-primary-800 font-medium">{message}</p>
+                </div>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-sm text-red-800">{error}</p>
+              <div className="bg-accent-50 border-l-4 border-accent rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-accent-800 font-medium">{error}</p>
+                </div>
               </div>
             )}
 
             {/* Danger Zone */}
             <div className="border-t pt-8">
-              <h3 className="text-lg font-medium text-red-900 mb-4">Danger Zone</h3>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h2 className="text-lg font-semibold text-accent-900 mb-4">Danger Zone</h2>
+              <div className="bg-accent-50 border-2 border-accent-200 rounded-xl p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-red-900">Sign Out</h4>
-                    <p className="text-sm text-red-700">Sign out of your account on this device</p>
+                    <h3 className="font-semibold text-accent-900 mb-1">Sign Out</h3>
+                    <p className="text-sm text-accent-700">Sign out of your account on this device</p>
                   </div>
                   <button
                     onClick={handleSignOut}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-dark transition-colors shadow-md hover:shadow-lg"
                   >
                     Sign Out
                   </button>
