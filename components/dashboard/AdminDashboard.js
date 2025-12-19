@@ -176,7 +176,7 @@ const loadData = async () => {
                 Welcome back, {profile.first_name}!
               </h2>
               <p className="text-gray-600 mt-1">
-                Here's what's happening with your events today.
+                Here&apos;s what&apos;s happening with your events today.
               </p>
             </div>
             <Link href="/events/create" className="btn-primary">

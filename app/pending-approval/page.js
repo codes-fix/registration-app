@@ -135,7 +135,7 @@ export default function PendingApprovalPage() {
                     <h4 className="text-sm font-semibold text-blue-900 mb-1">What happens next?</h4>
                     <ul className="text-xs text-blue-800 space-y-1">
                       <li>• Our admin team will review your application</li>
-                      <li>• You'll receive an email notification once approved</li>
+                      <li>• You&apos;ll receive an email notification once approved</li>
                       <li>• After approval, you can create and manage events</li>
                       <li>• This usually takes 1-2 business days</li>
                     </ul>

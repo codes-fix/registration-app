@@ -344,8 +344,8 @@ function ProfileSetupForm() {
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-blue-900 mb-1">Organizer Account Approval</h4>
                     <p className="text-xs text-blue-800">
-                      Your account will be reviewed by our admin team. You'll receive an email notification once approved. 
-                      After approval, you'll be able to create and manage events.
+                      Your account will be reviewed by our admin team. You&apos;ll receive an email notification once approved. 
+                      After approval, you&apos;ll be able to create and manage events.
                     </p>
                   </div>
                 </div>
