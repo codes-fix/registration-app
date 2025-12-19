@@ -34,10 +34,10 @@ export default function AdminOrganizersPage() {
         setUser(currentUser)
         setProfile(userProfile)
 
-        await loadOrganizers()
+        // Load organizers with initial filter
+        await loadOrganizers('pending_approval')
       } catch (error) {
         console.error('Error loading data:', error)
-      } finally {
         setLoading(false)
       }
     }
@@ -45,43 +45,50 @@ export default function AdminOrganizersPage() {
     loadData()
   }, [router])
 
-const loadOrganizers = async () => {
-  try {
-    setLoading(true)
-    
-    const response = await fetch(`/api/admin/organizers?filter=${filter}`, {
-      method: 'GET',
-      credentials: 'include', // Important for cookies
-    })
-    
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Error loading organizers:', errorData)
-      
-      if (response.status === 401) {
-        router.push('/login')
-        return
-      }
-      
-      if (response.status === 403) {
-        router.push('/unauthorized')
-        return
-      }
-      
-      alert(`Error: ${errorData.error}`)
-      return
+  // Load organizers when filter changes
+  useEffect(() => {
+    if (user && profile) {
+      loadOrganizers(filter)
     }
+  }, [filter, user, profile])
 
-    const { data } = await response.json()
-    console.log('Loaded organizers:', data)
-    setOrganizers(data || [])
-  } catch (err) {
-    console.error('Exception loading organizers:', err)
-    alert(`Exception: ${err.message}`)
-  } finally {
-    setLoading(false)
+  const loadOrganizers = async (currentFilter) => {
+    try {
+      setLoading(true)
+      
+      const response = await fetch(`/api/admin/organizers?filter=${currentFilter}`, {
+        method: 'GET',
+        credentials: 'include', // Important for cookies
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Error loading organizers:', errorData)
+        
+        if (response.status === 401) {
+          router.push('/login')
+          return
+        }
+        
+        if (response.status === 403) {
+          router.push('/unauthorized')
+          return
+        }
+        
+        alert(`Error: ${errorData.error}`)
+        return
+      }
+
+      const { data } = await response.json()
+      console.log('Loaded organizers:', data)
+      setOrganizers(data || [])
+    } catch (err) {
+      console.error('Exception loading organizers:', err)
+      alert(`Exception: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
 const handleApprove = async (organizerId) => {
   if (!confirm('Are you sure you want to approve this organizer?')) {
@@ -108,7 +115,7 @@ const handleApprove = async (organizerId) => {
     }
 
     alert('Organizer approved successfully!')
-    await loadOrganizers()
+    await loadOrganizers(filter)
 
     // TODO: Send email notification
   } catch (error) {
@@ -147,7 +154,7 @@ const handleReject = async (organizerId) => {
     }
 
     alert('Organizer rejected')
-    await loadOrganizers()
+    await loadOrganizers(filter)
 
     // TODO: Send email notification
   } catch (error) {
@@ -157,13 +164,6 @@ const handleReject = async (organizerId) => {
     setActionLoading(null)
   }
 }
-
-  useEffect(() => {
-  if (!loading && user && profile) {
-    loadOrganizers()
-  }
-}, [filter, loading, user, profile])
-
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('en-US', {

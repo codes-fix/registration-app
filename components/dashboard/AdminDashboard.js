@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import DashboardLayout from './DashboardLayout'
 import StatsCard from './StatsCard'
-import { createClient } from '@/lib/supabase/client'
 
 export default function AdminDashboard({ user, profile }) {
   const [stats, setStats] = useState({
@@ -33,94 +32,32 @@ const navigation = [
   }, [])
 
 const loadData = async () => {
-  const supabase = createClient()
-  
   try {
-    // Get events stats
-    const { data: eventsData, error: eventsError } = await supabase
-      .from('events')
-      .select('*')
-
-    if (eventsError) {
-      console.error('Error loading events:', eventsError)
-    }
-
-    // Get users count
-    const { count: usersCount, error: usersError } = await supabase
-      .from('user_profiles')
-      .select('*', { count: 'exact', head: true })
-
-    if (usersError) {
-      console.error('Error loading users count:', usersError)
-    }
-
-    // Get pending organizers count from API
-    let pendingOrganizersCount = 0
-    try {
-      const statsResponse = await fetch('/api/admin/stats')
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
-        pendingOrganizersCount = statsData.pendingOrganizers || 0
-      }
-    } catch (err) {
-      console.error('Error loading stats:', err)
-    }
-
-    // FIXED: Get registrations with proper foreign key syntax
-    const { data: registrationsData, error: regError } = await supabase
-      .from('registrations')
-      .select(`
-        *,
-        event:events(title, start_date),
-        user:user_profiles(first_name, last_name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    if (regError) {
-      console.error('Error loading registrations:', regError)
-    }
-
-    const now = new Date()
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-
-    // Calculate stats
-    const allEvents = eventsData || []
-    const activeEvents = allEvents.filter(e => 
-      e.status === 'published' || e.status === 'registration_open'
-    ).length
+    // Get all stats from admin API (uses service role, bypasses RLS)
+    const statsResponse = await fetch('/api/admin/stats')
     
-    const upcomingEventsCount = allEvents.filter(e => 
-      new Date(e.start_date) > now
-    ).length
+    if (!statsResponse.ok) {
+      throw new Error(`API error: ${statsResponse.status}`)
+    }
 
-    const totalRevenue = registrationsData?.reduce((sum, reg) => 
-      sum + (reg.total_amount || 0), 0
-    ) || 0
-
-    const recentRegs = registrationsData?.filter(r => 
-      new Date(r.created_at) > sevenDaysAgo
-    ).length || 0
+    const statsData = await statsResponse.json()
 
     setStats({
-      totalEvents: allEvents.length,
-      activeEvents,
-      upcomingEvents: upcomingEventsCount,
-      totalUsers: usersCount || 0,
-      totalRevenue: totalRevenue,
-      totalRegistrations: registrationsData?.length || 0,
-      recentRegistrations: recentRegs,
-      pendingOrganizers: pendingOrganizersCount
+      totalEvents: statsData.totalEvents || 0,
+      activeEvents: statsData.activeEvents || 0,
+      upcomingEvents: statsData.upcomingEvents || 0,
+      totalUsers: statsData.totalUsers || 0,
+      totalRevenue: statsData.totalRevenue || 0,
+      totalRegistrations: statsData.totalRegistrations || 0,
+      recentRegistrations: statsData.recentRegistrations || 0,
+      pendingOrganizers: statsData.pendingOrganizers || 0
     })
 
     // Set recent activity
-    setRecentActivity(registrationsData?.slice(0, 5) || [])
+    setRecentActivity(statsData.recentActivity || [])
 
     // Set upcoming events
-    const upcoming = allEvents
-      .filter(e => new Date(e.start_date) > now)
-      .slice(0, 5)
-    setUpcomingEvents(upcoming)
+    setUpcomingEvents(statsData.upcomingEventsList || [])
 
   } catch (error) {
     console.error('Error loading admin data:', error)

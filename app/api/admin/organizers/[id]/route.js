@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 function createAdminClient() {
   return createClient(
@@ -14,31 +14,15 @@ function createAdminClient() {
   )
 }
 
-async function createAuthClient() {
-  const cookieStore = await cookies()
-  
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-      },
-    }
-  )
-}
-
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params
     const body = await request.json()
     const { action, notes } = body // action: 'approve' or 'reject'
 
-    // Check authentication
-    const authClient = await createAuthClient()
-    const { data: { user }, error: userError } = await authClient.auth.getUser()
+    // Check authentication using server client
+    const serverClient = await createServerClient()
+    const { data: { user }, error: userError } = await serverClient.auth.getUser()
     
     if (userError || !user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
