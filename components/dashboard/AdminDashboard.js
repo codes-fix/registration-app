@@ -54,23 +54,26 @@ const loadData = async () => {
       console.error('Error loading users count:', usersError)
     }
 
-    // Get pending organizers count
-    const { data: pendingOrganizersData, error: pendingError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('role', 'organizer')
-      .eq('approval_status', 'pending_approval')
-
-    if (pendingError) {
-      console.error('Error loading pending organizers:', pendingError)
+    // Get pending organizers count from API
+    let pendingOrganizersCount = 0
+    try {
+      const statsResponse = await fetch('/api/admin/stats')
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json()
+        pendingOrganizersCount = statsData.pendingOrganizers || 0
+      }
+    } catch (err) {
+      console.error('Error loading stats:', err)
     }
 
-    console.log('Pending organizers:', pendingOrganizersData) // DEBUG
-
-    // Get registrations
+    // FIXED: Get registrations with proper foreign key syntax
     const { data: registrationsData, error: regError } = await supabase
       .from('registrations')
-      .select('total_amount, created_at, status, event:events(title, start_date), user_profiles!registrations_user_id_fkey(first_name, last_name)')
+      .select(`
+        *,
+        event:events(title, start_date),
+        user:user_profiles(first_name, last_name)
+      `)
       .order('created_at', { ascending: false })
       .limit(10)
 
@@ -107,7 +110,7 @@ const loadData = async () => {
       totalRevenue: totalRevenue,
       totalRegistrations: registrationsData?.length || 0,
       recentRegistrations: recentRegs,
-      pendingOrganizers: pendingOrganizersData?.length || 0
+      pendingOrganizers: pendingOrganizersCount
     })
 
     // Set recent activity
@@ -125,7 +128,6 @@ const loadData = async () => {
     setLoading(false)
   }
 }
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -251,58 +253,58 @@ const loadData = async () => {
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="bg-white rounded-lg shadow-sm border border-green-100">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Registrations</h3>
-                <Link href="/registrations" className="text-sm text-primary hover:text-primary-600">
-                  View All →
-                </Link>
+{/* Recent Activity */}
+<div className="bg-white rounded-lg shadow-sm border border-green-100">
+  <div className="p-6 border-b border-gray-200">
+    <div className="flex items-center justify-between">
+      <h3 className="text-lg font-semibold text-gray-900">Recent Registrations</h3>
+      <Link href="/registrations" className="text-sm text-primary hover:text-primary-600">
+        View All →
+      </Link>
+    </div>
+  </div>
+  {loading ? (
+    <div className="p-6">
+      <div className="animate-pulse space-y-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-16 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    </div>
+  ) : recentActivity.length > 0 ? (
+    <div className="divide-y divide-gray-200 max-h-80 overflow-y-auto">
+      {recentActivity.map((activity, index) => (
+        <div key={index} className="p-4 hover:bg-gray-50 transition-colors">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">
+                {activity.user?.first_name} {activity.user?.last_name}
+              </p>
+              <p className="text-xs text-gray-600 mt-0.5">
+                {activity.event?.title}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(activity.status)}`}>
+                  {activity.status}
+                </span>
+                <p className="text-xs text-gray-500">
+                  {formatDateTime(activity.created_at)}
+                </p>
               </div>
             </div>
-            {loading ? (
-              <div className="p-6">
-                <div className="animate-pulse space-y-4">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-gray-200 rounded"></div>
-                  ))}
-                </div>
-              </div>
-            ) : recentActivity.length > 0 ? (
-              <div className="divide-y divide-gray-200 max-h-80 overflow-y-auto">
-                {recentActivity.map((activity, index) => (
-                  <div key={index} className="p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          {activity.user_profiles?.first_name} {activity.user_profiles?.last_name}
-                        </p>
-                        <p className="text-xs text-gray-600 mt-0.5">
-                          {activity.event?.title}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(activity.status)}`}>
-                            {activity.status}
-                          </span>
-                          <p className="text-xs text-gray-500">
-                            {formatDateTime(activity.created_at)}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-sm font-semibold text-green-600">
-                        {formatCurrency(activity.total_amount || 0)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-6 text-center text-gray-500">
-                No recent registrations
-              </div>
-            )}
+            <span className="text-sm font-semibold text-green-600">
+              {formatCurrency(activity.total_amount || 0)}
+            </span>
           </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="p-6 text-center text-gray-500">
+      No recent registrations
+    </div>
+  )}
+</div>
         </div>
 
         {/* Upcoming Events */}

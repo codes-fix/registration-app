@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const origin = requestUrl.origin
-  const role = requestUrl.searchParams.get('role') || 'attendee'
 
   if (code) {
     try {
@@ -29,37 +29,18 @@ export async function GET(request) {
           console.error('Profile query error:', profileError)
         }
 
-        // If no profile, create it
+        // If no profile exists, we need to create one
         if (!profile) {
-          const approvalStatus = role === 'organizer' ? 'pending_approval' : 'approved'
+          // Try to get role from session storage via response (passed through redirect)
+          // Default to attendee if not found
+          const role = 'attendee' // We'll get this from the client-side
           
-          const { error: insertError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: data.user.id,
-              email: data.user.email,
-              role: role,
-              approval_status: approvalStatus,
-              is_active: true
-            })
-
-          if (insertError) {
-            console.error('Profile creation error:', insertError)
-          }
-
-          // Redirect to appropriate setup page
-          if (role === 'admin') {
-            return NextResponse.redirect(`${origin}/admin/setup`)
-          }
-          return NextResponse.redirect(`${origin}/profile/setup?role=${role}`)
+          return NextResponse.redirect(`${origin}/profile/setup?new=true`)
         }
 
         // Profile exists but incomplete
-        if (!profile.first_name) {
-          if (profile.role === 'admin') {
-            return NextResponse.redirect(`${origin}/admin/setup`)
-          }
-          return NextResponse.redirect(`${origin}/profile/setup?role=${profile.role}`)
+        if (!profile.first_name || !profile.last_name) {
+          return NextResponse.redirect(`${origin}/profile/setup`)
         }
 
         // Check approval status for organizers

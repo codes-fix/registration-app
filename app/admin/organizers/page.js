@@ -46,101 +46,124 @@ export default function AdminOrganizersPage() {
   }, [router])
 
 const loadOrganizers = async () => {
-  const supabase = createClient()
-
   try {
-    let query = supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('role', 'organizer')
-      .order('created_at', { ascending: false })
-
-    if (filter !== 'all') {
-      query = query.eq('approval_status', filter)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error loading organizers:', error)
-      alert(`Error loading organizers: ${error.message}`)
+    setLoading(true)
+    
+    const response = await fetch(`/api/admin/organizers?filter=${filter}`, {
+      method: 'GET',
+      credentials: 'include', // Important for cookies
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('Error loading organizers:', errorData)
+      
+      if (response.status === 401) {
+        router.push('/login')
+        return
+      }
+      
+      if (response.status === 403) {
+        router.push('/unauthorized')
+        return
+      }
+      
+      alert(`Error: ${errorData.error}`)
       return
     }
 
-    console.log('Loaded organizers:', data) // DEBUG
+    const { data } = await response.json()
+    console.log('Loaded organizers:', data)
     setOrganizers(data || [])
   } catch (err) {
     console.error('Exception loading organizers:', err)
     alert(`Exception: ${err.message}`)
+  } finally {
+    setLoading(false)
+  }
+}
+
+const handleApprove = async (organizerId) => {
+  if (!confirm('Are you sure you want to approve this organizer?')) {
+    return
+  }
+
+  setActionLoading(organizerId)
+
+  try {
+    const response = await fetch(`/api/admin/organizers/${organizerId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        action: 'approve'
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to approve organizer')
+    }
+
+    alert('Organizer approved successfully!')
+    await loadOrganizers()
+
+    // TODO: Send email notification
+  } catch (error) {
+    console.error('Error approving organizer:', error)
+    alert(`Failed to approve organizer: ${error.message}`)
+  } finally {
+    setActionLoading(null)
+  }
+}
+
+const handleReject = async (organizerId) => {
+  const notes = prompt('Enter rejection reason (optional):')
+  
+  if (notes === null) {
+    return // User cancelled
+  }
+
+  setActionLoading(organizerId)
+
+  try {
+    const response = await fetch(`/api/admin/organizers/${organizerId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        action: 'reject',
+        notes: notes || null
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to reject organizer')
+    }
+
+    alert('Organizer rejected')
+    await loadOrganizers()
+
+    // TODO: Send email notification
+  } catch (error) {
+    console.error('Error rejecting organizer:', error)
+    alert(`Failed to reject organizer: ${error.message}`)
+  } finally {
+    setActionLoading(null)
   }
 }
 
   useEffect(() => {
-    if (!loading) {
-      loadOrganizers()
-    }
-  }, [filter])
-
-  const handleApprove = async (organizerId) => {
-    setActionLoading(organizerId)
-    const supabase = createClient()
-
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          approval_status: 'approved',
-          approved_by: user.id,
-          approved_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', organizerId)
-
-      if (error) throw error
-
-      alert('Organizer approved successfully!')
-      await loadOrganizers()
-
-      // TODO: Send email notification to organizer
-    } catch (error) {
-      console.error('Error approving organizer:', error)
-      alert('Failed to approve organizer')
-    } finally {
-      setActionLoading(null)
-    }
+  if (!loading && user && profile) {
+    loadOrganizers()
   }
+}, [filter, loading, user, profile])
 
-  const handleReject = async (organizerId) => {
-    const notes = prompt('Enter rejection reason (optional):')
-    
-    setActionLoading(organizerId)
-    const supabase = createClient()
-
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          approval_status: 'rejected',
-          approval_notes: notes || null,
-          approved_by: user.id,
-          approved_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', organizerId)
-
-      if (error) throw error
-
-      alert('Organizer rejected')
-      await loadOrganizers()
-
-      // TODO: Send email notification to organizer
-    } catch (error) {
-      console.error('Error rejecting organizer:', error)
-      alert('Failed to reject organizer')
-    } finally {
-      setActionLoading(null)
-    }
-  }
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('en-US', {

@@ -26,7 +26,7 @@ function ProfileSetupForm() {
   })
 
   useEffect(() => {
-    async function checkUser() {
+  async function checkUser() {
   try {
     const currentUser = await getCurrentUser()
     if (!currentUser) {
@@ -35,9 +35,14 @@ function ProfileSetupForm() {
     }
     setUser(currentUser)
     
+    // Check for role in session storage (from OAuth flow)
+    let storedRole = 'attendee'
+    if (typeof window !== 'undefined') {
+      storedRole = sessionStorage.getItem('registration_role') || 'attendee'
+    }
+    
     const supabase = createClient()
     
-    // Try to get existing profile
     const { data: existingProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
@@ -45,39 +50,53 @@ function ProfileSetupForm() {
       .maybeSingle()
 
     if (profileError) {
-      console.error('Error checking profile:', profileError)
-      // Don't fail completely, just log the error
-      console.log('Profile error details:', {
-        message: profileError.message,
-        details: profileError.details,
-        hint: profileError.hint,
-        code: profileError.code
-      })
+      console.error('Profile error:', profileError)
       
-      // Set default form data with role from URL
-      setFormData(prev => ({
-        ...prev,
-        role: roleFromUrl
-      }))
+      // If error is about missing profile, create one
+      if (profileError.code === 'PGRST116') {
+        // No profile exists, create initial one
+        const approvalStatus = storedRole === 'organizer' ? 'pending_approval' : 'approved'
+        
+        const { error: insertError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: currentUser.id,
+            email: currentUser.email,
+            role: storedRole,
+            approval_status: approvalStatus,
+            is_active: true
+          })
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError)
+          setError('Failed to create profile. Please try again.')
+        }
+        
+        setFormData(prev => ({
+          ...prev,
+          role: storedRole
+        }))
+        
+        setLoading(false)
+        return
+      }
       
       setLoading(false)
       return
     }
 
-    // If profile exists and is complete, redirect to appropriate page
-    if (existingProfile && existingProfile.first_name) {
-      // Check if organizer pending approval
+    // Profile exists and is complete
+    if (existingProfile && existingProfile.first_name && existingProfile.last_name) {
       if (existingProfile.role === 'organizer' && existingProfile.approval_status === 'pending_approval') {
         router.push('/pending-approval')
         return
       }
       
-      // Otherwise go to dashboard
       router.push('/dashboard')
       return
     }
 
-    // Profile exists but incomplete, pre-fill data
+    // Profile exists but incomplete
     if (existingProfile) {
       setFormData({
         first_name: existingProfile.first_name || '',
@@ -85,27 +104,27 @@ function ProfileSetupForm() {
         phone: existingProfile.phone || '',
         company: existingProfile.company || '',
         job_title: existingProfile.job_title || '',
-        role: existingProfile.role || roleFromUrl
+        role: existingProfile.role || storedRole
       })
     } else {
-      // No profile exists, use role from URL
+      // No profile, use stored role
       setFormData(prev => ({
         ...prev,
-        role: roleFromUrl
+        role: storedRole
       }))
+    }
+    
+    // Clear session storage after reading
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('registration_role')
     }
     
   } catch (err) {
     console.error('Error in checkUser:', err)
-    console.log('Error details:', {
-      message: err.message,
-      stack: err.stack
-    })
-    // Don't show error to user, just log it
   } finally {
     setLoading(false)
   }
-}
+  }
 
     checkUser()
   }, [router, roleFromUrl])
