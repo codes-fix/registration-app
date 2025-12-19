@@ -1,27 +1,31 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getCurrentUser, resendVerificationEmail } from '@/lib/auth'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [resending, setResending] = useState(false)
   const [message, setMessage] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email')
 
   useEffect(() => {
     async function checkUser() {
       const currentUser = await getCurrentUser()
       if (!currentUser) {
-        router.push('/login')
+        // Not logged in yet - normal for registration flow
+        setLoading(false)
         return
       }
 
       if (currentUser.email_confirmed_at) {
-        router.push('/dashboard')
+        router.push('/profile/setup')
         return
       }
 
@@ -68,9 +72,9 @@ export default function VerifyEmailPage() {
             Verify Your Email
           </h1>
           <p className="text-gray-600 mb-6">
-            We&apos;ve sent a verification email to:
+            We've sent a verification email to:
             <br />
-            <strong>{user?.email}</strong>
+            <strong>{email || user?.email || 'your email'}</strong>
           </p>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -89,16 +93,18 @@ export default function VerifyEmailPage() {
             </div>
           )}
 
-          <button
-            onClick={handleResend}
-            disabled={resending}
-            className="btn-primary w-full mb-4"
-          >
-            {resending ? 'Sending...' : 'Resend Verification Email'}
-          </button>
+          {user && (
+            <button
+              onClick={handleResend}
+              disabled={resending}
+              className="btn-primary w-full mb-4"
+            >
+              {resending ? 'Sending...' : 'Resend Verification Email'}
+            </button>
+          )}
 
           <div className="text-sm text-gray-600">
-            <p>Didn&apos;t receive the email? Check your spam folder.</p>
+            <p>Didn't receive the email? Check your spam folder.</p>
             <Link href="/support" className="text-primary hover:text-primary-600 font-medium">
               Need help?
             </Link>
@@ -106,5 +112,17 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }

@@ -20,75 +20,111 @@ export default function AdminDashboard({ user, profile }) {
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const navigation = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Event Management', href: '/events' },
-    { label: 'Users', href: '/users' },
-    { label: 'Reports', href: '/reports' }
-  ]
+const navigation = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Organizers', href: '/admin/organizers' },  // NEW
+  { label: 'Events', href: '/admin/events' },
+  { label: 'Users', href: '/admin/users' },
+  { label: 'Reports', href: '/admin/reports' }
+]
 
   useEffect(() => {
     loadData()
   }, [])
 
-  const loadData = async () => {
-    const supabase = createClient()
-    
-    try {
-      // Get events stats
-      const [eventsCount, usersCount, registrationsData, eventsData] = await Promise.all([
-        supabase.from('events').select('*', { count: 'exact' }),
-        supabase.from('user_profiles').select('*', { count: 'exact' }),
-        supabase.from('registrations').select('total_amount, created_at, status, event:events(title, start_date), user_profiles!registrations_user_id_fkey(first_name, last_name)').order('created_at', { ascending: false }).limit(10),
-        supabase.from('events').select('*').order('start_date', { ascending: true })
-      ])
+const loadData = async () => {
+  const supabase = createClient()
+  
+  try {
+    // Get events stats
+    const { data: eventsData, error: eventsError } = await supabase
+      .from('events')
+      .select('*')
 
-      const now = new Date()
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-
-      // Calculate stats
-      const allEvents = eventsData.data || []
-      const activeEvents = allEvents.filter(e => 
-        e.status === 'published' || e.status === 'registration_open'
-      ).length
-      
-      const upcomingEventsCount = allEvents.filter(e => 
-        new Date(e.start_date) > now
-      ).length
-
-      const totalRevenue = registrationsData.data?.reduce((sum, reg) => 
-        sum + (reg.total_amount || 0), 0
-      ) || 0
-
-      const recentRegs = registrationsData.data?.filter(r => 
-        new Date(r.created_at) > sevenDaysAgo
-      ).length || 0
-
-      setStats({
-        totalEvents: eventsCount.count || 0,
-        activeEvents,
-        upcomingEvents: upcomingEventsCount,
-        totalUsers: usersCount.count || 0,
-        totalRevenue: totalRevenue,
-        totalRegistrations: registrationsData.data?.length || 0,
-        recentRegistrations: recentRegs
-      })
-
-      // Set recent activity
-      setRecentActivity(registrationsData.data?.slice(0, 5) || [])
-
-      // Set upcoming events
-      const upcoming = allEvents
-        .filter(e => new Date(e.start_date) > now)
-        .slice(0, 5)
-      setUpcomingEvents(upcoming)
-
-    } catch (error) {
-      console.error('Error loading admin data:', error)
-    } finally {
-      setLoading(false)
+    if (eventsError) {
+      console.error('Error loading events:', eventsError)
     }
+
+    // Get users count
+    const { count: usersCount, error: usersError } = await supabase
+      .from('user_profiles')
+      .select('*', { count: 'exact', head: true })
+
+    if (usersError) {
+      console.error('Error loading users count:', usersError)
+    }
+
+    // Get pending organizers count
+    const { data: pendingOrganizersData, error: pendingError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('role', 'organizer')
+      .eq('approval_status', 'pending_approval')
+
+    if (pendingError) {
+      console.error('Error loading pending organizers:', pendingError)
+    }
+
+    console.log('Pending organizers:', pendingOrganizersData) // DEBUG
+
+    // Get registrations
+    const { data: registrationsData, error: regError } = await supabase
+      .from('registrations')
+      .select('total_amount, created_at, status, event:events(title, start_date), user_profiles!registrations_user_id_fkey(first_name, last_name)')
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    if (regError) {
+      console.error('Error loading registrations:', regError)
+    }
+
+    const now = new Date()
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+    // Calculate stats
+    const allEvents = eventsData || []
+    const activeEvents = allEvents.filter(e => 
+      e.status === 'published' || e.status === 'registration_open'
+    ).length
+    
+    const upcomingEventsCount = allEvents.filter(e => 
+      new Date(e.start_date) > now
+    ).length
+
+    const totalRevenue = registrationsData?.reduce((sum, reg) => 
+      sum + (reg.total_amount || 0), 0
+    ) || 0
+
+    const recentRegs = registrationsData?.filter(r => 
+      new Date(r.created_at) > sevenDaysAgo
+    ).length || 0
+
+    setStats({
+      totalEvents: allEvents.length,
+      activeEvents,
+      upcomingEvents: upcomingEventsCount,
+      totalUsers: usersCount || 0,
+      totalRevenue: totalRevenue,
+      totalRegistrations: registrationsData?.length || 0,
+      recentRegistrations: recentRegs,
+      pendingOrganizers: pendingOrganizersData?.length || 0
+    })
+
+    // Set recent activity
+    setRecentActivity(registrationsData?.slice(0, 5) || [])
+
+    // Set upcoming events
+    const upcoming = allEvents
+      .filter(e => new Date(e.start_date) > now)
+      .slice(0, 5)
+    setUpcomingEvents(upcoming)
+
+  } catch (error) {
+    console.error('Error loading admin data:', error)
+  } finally {
+    setLoading(false)
   }
+}
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -166,6 +202,14 @@ export default function AdminDashboard({ user, profile }) {
             subtitle="registered users"
           />
           <StatsCard
+            title="Pending Organizers"  // NEW
+            value={stats.pendingOrganizers}
+            icon="⏳"
+            color="warning"
+            subtitle="awaiting approval"
+            trend={stats.pendingOrganizers > 0 ? { direction: 'up', value: 'Needs attention' } : null}
+          />
+          <StatsCard
             title="Total Revenue"
             value={formatCurrency(stats.totalRevenue)}
             icon="💰"
@@ -189,6 +233,9 @@ export default function AdminDashboard({ user, profile }) {
               <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
             </div>
             <div className="p-6 grid grid-cols-2 gap-4">
+              <Link href="/admin/organizers" className="btn-primary text-center">  {/* NEW */}
+                Manage Organizers
+              </Link>
               <Link href="/events/create" className="btn-primary text-center">
                 Create Event
               </Link>

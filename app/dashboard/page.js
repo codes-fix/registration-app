@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import AttendeeDashboard from '@/components/dashboard/AttendeeDashboard'
-import SpeakerDashboard from '@/components/dashboard/SpeakerDashboard'
-import StaffDashboard from '@/components/dashboard/StaffDashboard'
+import OrganizerDashboard from '@/components/dashboard/OrganizerDashboard'
 import AdminDashboard from '@/components/dashboard/AdminDashboard'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
@@ -27,6 +26,12 @@ export default function DashboardPage() {
         const userProfile = await getUserProfile(currentUser.id)
         if (!userProfile) {
           router.push('/profile/setup')
+          return
+        }
+
+        // Check if organizer pending approval
+        if (userProfile.role === 'organizer' && userProfile.approval_status === 'pending_approval') {
+          router.push('/pending-approval')
           return
         }
 
@@ -52,20 +57,16 @@ export default function DashboardPage() {
   }
 
   if (!user || !profile) {
-    return null // Will redirect in useEffect
+    return null
   }
 
   const renderDashboard = () => {
     switch (profile.role) {
       case 'admin':
         return <AdminDashboard user={user} profile={profile} />
-      case 'speaker':
-        return <SpeakerDashboard user={user} profile={profile} />
-      case 'staff':
-      case 'volunteer':
-        return <StaffDashboard user={user} profile={profile} />
+      case 'organizer':
+        return <OrganizerDashboard user={user} profile={profile} />
       case 'attendee':
-      case 'guest':
       default:
         return <AttendeeDashboard user={user} profile={profile} />
     }

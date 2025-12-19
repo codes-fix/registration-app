@@ -7,10 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- User roles enum
 CREATE TYPE user_role AS ENUM (
   'attendee',
-  'speaker', 
-  'staff',
-  'volunteer',
-  'guest',
+  'organizer',
   'admin'
 );
 
@@ -84,6 +81,18 @@ CREATE TABLE user_profiles (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+-- Add approval status for organizers
+ALTER TABLE user_profiles 
+ADD COLUMN approval_status TEXT DEFAULT 'approved' CHECK (approval_status IN ('pending_approval', 'approved', 'rejected')),
+ADD COLUMN approval_notes TEXT,
+ADD COLUMN approved_by UUID REFERENCES user_profiles(id),
+ADD COLUMN approved_at TIMESTAMP WITH TIME ZONE;
+
+-- Add index for filtering pending approvals
+CREATE INDEX idx_user_profiles_approval_status ON user_profiles(approval_status);
+
+-- Update comment
+COMMENT ON COLUMN user_profiles.approval_status IS 'Approval status for event organizers. Attendees are auto-approved.';
 
 -- Events table
 CREATE TABLE events (

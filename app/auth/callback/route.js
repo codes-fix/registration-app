@@ -5,7 +5,7 @@ export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const origin = requestUrl.origin
-  const next = requestUrl.searchParams.get('next') || '/profile/setup'
+  const role = requestUrl.searchParams.get('role') || 'attendee'
 
   if (code) {
     try {
@@ -19,18 +19,55 @@ export async function GET(request) {
 
       if (data?.user) {
         // Check if profile exists
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', data.user.id)
-          .single()
+          .maybeSingle()
 
-        // If no profile or incomplete profile, redirect to setup
-        if (!profile || !profile.first_name) {
-          return NextResponse.redirect(`${origin}/profile/setup`)
+        if (profileError) {
+          console.error('Profile query error:', profileError)
         }
 
-        // Profile exists, go to dashboard
+        // If no profile, create it
+        if (!profile) {
+          const approvalStatus = role === 'organizer' ? 'pending_approval' : 'approved'
+          
+          const { error: insertError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              role: role,
+              approval_status: approvalStatus,
+              is_active: true
+            })
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError)
+          }
+
+          // Redirect to appropriate setup page
+          if (role === 'admin') {
+            return NextResponse.redirect(`${origin}/admin/setup`)
+          }
+          return NextResponse.redirect(`${origin}/profile/setup?role=${role}`)
+        }
+
+        // Profile exists but incomplete
+        if (!profile.first_name) {
+          if (profile.role === 'admin') {
+            return NextResponse.redirect(`${origin}/admin/setup`)
+          }
+          return NextResponse.redirect(`${origin}/profile/setup?role=${profile.role}`)
+        }
+
+        // Check approval status for organizers
+        if (profile.role === 'organizer' && profile.approval_status === 'pending_approval') {
+          return NextResponse.redirect(`${origin}/pending-approval`)
+        }
+
+        // Profile complete and approved
         return NextResponse.redirect(`${origin}/dashboard`)
       }
     } catch (err) {
@@ -39,6 +76,5 @@ export async function GET(request) {
     }
   }
 
-  // No code present, redirect to login
   return NextResponse.redirect(`${origin}/login`)
 }

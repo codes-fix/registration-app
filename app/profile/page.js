@@ -233,11 +233,7 @@ export default function ProfilePage() {
                     className="input"
                   >
                     <option value="attendee">Event Attendee</option>
-                    <option value="speaker">Speaker</option>
-                    <option value="staff">Staff Member</option>
-                    <option value="volunteer">Volunteer</option>
-                    <option value="guest">Guest</option>
-                  </select>
+                    </select>
                   <p className="text-xs text-gray-500 mt-1">
                     Your role determines your dashboard features
                   </p>
