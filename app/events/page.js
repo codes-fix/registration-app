@@ -136,26 +136,22 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100">
       {/* Header */}
-      <header className="bg-white shadow-md border-b border-primary-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">{title}</h1>
-              <p className="text-gray-600 mt-1 font-medium">{description}</p>
-            </div>
-            <div className="mt-4 md:mt-0 flex space-x-3">
-              <Link href="/dashboard" className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all font-medium">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back
-              </Link>
+      <header className="bg-white shadow-sm border-b border-green-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <div className="flex gap-3">
               {(isAdmin || isOrganizer) && (
-                <Link href="/events/create" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium">
-                  <PlusIcon className="w-5 h-5" />
-                  Create Event
+                <Link href="/events/create" className="btn-primary">
+                  + Create Event
                 </Link>
               )}
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                ← Back
+              </button>
             </div>
           </div>
         </div>

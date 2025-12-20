@@ -68,34 +68,35 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-primary-200 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200 rounded-full opacity-20 blur-3xl"></div>
+        {/* Decorative elements with floating animation */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-primary-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200 rounded-full opacity-20 blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-accent-200 rounded-full opacity-10 blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-primary-200 shadow-md mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-primary-200 shadow-md mb-6 animate-fade-in-down">
             <CheckCircleIcon className="w-5 h-5 text-primary-600" />
-            <span className="text-sm font-semibold text-gray-700">Trusted by 10,000+ Event Organizers</span>
+            <span className="text-sm font-semibold text-gray-700">Trusted by 25,000+ Event Organizers Worldwide</span>
           </div>
           
-          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Professional Event
-            <span className="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent"> Registration</span> &
-            <span className="bg-gradient-to-r from-secondary-600 to-secondary-700 bg-clip-text text-transparent"> Management</span>
+          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            The Ultimate Platform for
+            <span className="bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent"> Event Management</span> &
+            <span className="bg-gradient-to-r from-secondary-600 to-secondary-700 bg-clip-text text-transparent"> Registration</span>
           </h2>
-          <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto font-medium">
-            Streamline your event registration process with our comprehensive platform. 
-            From attendee management to speaker portals, we&apos;ve got you covered.
+          <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto font-medium animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+            Powerful tools for event organizers, seamless experiences for attendees. Manage registrations, 
+            speakers, staff, and attendees all in one place with enterprise-grade features.
           </p>
           
           {!user && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="inline-flex items-center justify-center gap-2 text-lg px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-200 font-semibold">
-                <TicketIcon className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style={{animationDelay: '0.6s'}}>
+              <Link href="/register" className="inline-flex items-center justify-center gap-2 text-lg px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-200 font-semibold group">
+                <TicketIcon className="w-6 h-6 group-hover:rotate-12 transition-transform duration-200" />
                 Start Free Trial
               </Link>
-              <Link href="#features" className="inline-flex items-center justify-center gap-2 text-lg px-8 py-3 bg-white text-primary-700 border-2 border-primary-300 rounded-xl hover:bg-primary-50 hover:shadow-lg transition-all duration-200 font-semibold">
-                <SearchIcon className="w-6 h-6" />
+              <Link href="#features" className="inline-flex items-center justify-center gap-2 text-lg px-8 py-3 bg-white text-primary-700 border-2 border-primary-300 rounded-xl hover:bg-primary-50 hover:shadow-lg transition-all duration-200 font-semibold group">
+                <SearchIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
                 Explore Features
               </Link>
             </div>
@@ -119,7 +120,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section id="features" className="py-20 bg-white/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full border border-primary-200 mb-4">
               <CheckCircleIcon className="w-5 h-5 text-primary-600" />
               <span className="text-sm font-semibold text-primary-700">Feature-Rich Platform</span>
@@ -133,8 +134,8 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature cards */}
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
+            {/* Feature cards with staggered animation */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.1s'}}>
               <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
                 <TicketIcon className="w-7 h-7 text-white" />
               </div>
@@ -146,8 +147,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <div className="w-14 h-14 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 shadow-md">
                 <MoneyIcon className="w-7 h-7 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
@@ -158,8 +159,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.3s'}}>
+              <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 shadow-md">
                 <CheckCircleIcon className="w-7 h-7 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
@@ -170,8 +171,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.4s'}}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 shadow-md">
                 <UserIcon className="w-7 h-7 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
@@ -182,8 +183,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.5s'}}>
+              <div className="w-14 h-14 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 shadow-md">
                 <ChartIcon className="w-7 h-7 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
@@ -194,7 +195,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-slide-up" style={{animationDelay: '0.6s'}}>
               <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-md">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -214,62 +215,199 @@ export default function HomePage() {
       {/* User Types Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-50 rounded-full border border-secondary-200 mb-4">
               <UserIcon className="w-5 h-5 text-secondary-600" />
-              <span className="text-sm font-semibold text-secondary-700">Designed for Everyone</span>
+              <span className="text-sm font-semibold text-secondary-700">Role-Based Access Control</span>
             </div>
             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Built for Every Role
+              Tailored Experiences for Every User
             </h3>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto font-medium">
-              Tailored experiences for organizers, speakers, staff, and attendees.
+              Secure, role-based dashboards with custom permissions and workflows for each user type.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {/* Admin */}
+            <div className="text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 animate-slide-up" style={{animationDelay: '0.1s'}}>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold text-purple-900 mb-2">Admins</h4>
+              <p className="text-purple-700 text-sm leading-relaxed font-medium">
+                Full platform control, user management, organizer approvals, and system configuration.
+              </p>
+            </div>
+
+            {/* Organizers */}
+            <div className="text-center bg-gradient-to-br from-accent-50 to-accent-100 rounded-xl p-6 shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-accent-200 hover:border-accent-400 animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:rotate-12 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Event Organizers</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Complete event management dashboard with full control over all aspects.
+              <h4 className="text-lg font-bold text-accent-900 mb-2">Organizers</h4>
+              <p className="text-accent-700 text-sm leading-relaxed font-medium">
+                Create and manage events, track registrations, handle payments, and access analytics.
               </p>
             </div>
 
-            <div className="text-center bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <UserIcon className="w-8 h-8 text-white" />
+            {/* Speakers */}
+            <div className="text-center bg-gradient-to-br from-secondary-50 to-secondary-100 rounded-xl p-6 shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-secondary-200 hover:border-secondary-400 animate-slide-up" style={{animationDelay: '0.3s'}}>
+              <div className="w-16 h-16 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Speakers</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Dedicated portal for session management, materials, and communication.
+              <h4 className="text-lg font-bold text-secondary-900 mb-2">Speakers</h4>
+              <p className="text-secondary-700 text-sm leading-relaxed font-medium">
+                Dedicated portal for session schedules, materials upload, attendee Q&A, and bio management.
               </p>
             </div>
 
-            <div className="text-center bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            {/* Staff & Volunteers */}
+            <div className="text-center bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-6 shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-primary-200 hover:border-primary-400 animate-slide-up" style={{animationDelay: '0.4s'}}>
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:rotate-12 transition-transform duration-300">
                 <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Staff & Volunteers</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Schedule management, task assignments, and real-time coordination tools.
+              <h4 className="text-lg font-bold text-primary-900 mb-2">Staff & Volunteers</h4>
+              <p className="text-primary-700 text-sm leading-relaxed font-medium">
+                Task assignments, shift schedules, check-in management, and real-time coordination tools.
               </p>
             </div>
 
-            <div className="text-center bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-200 border border-gray-200">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            {/* Attendees */}
+            <div className="text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 shadow-md hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 border-blue-200 hover:border-blue-400 animate-slide-up" style={{animationDelay: '0.5s'}}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <TicketIcon className="w-8 h-8 text-white" />
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Attendees</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Simple registration, digital tickets, and personalized event experience.
+              <h4 className="text-lg font-bold text-blue-900 mb-2">Attendees</h4>
+              <p className="text-blue-700 text-sm leading-relaxed font-medium">
+                Easy registration, digital tickets, personalized agendas, networking features, and event updates.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12 animate-fade-in-up">
+            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Trusted by Event Professionals Worldwide
+            </h3>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Join thousands of organizations that have transformed their event management
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center transform hover:scale-110 transition-transform duration-300 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2 animate-pulse">25K+</div>
+              <div className="text-white/90 font-medium">Event Organizers</div>
+            </div>
+            <div className="text-center transform hover:scale-110 transition-transform duration-300 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2 animate-pulse" style={{animationDelay: '0.5s'}}>500K+</div>
+              <div className="text-white/90 font-medium">Events Hosted</div>
+            </div>
+            <div className="text-center transform hover:scale-110 transition-transform duration-300 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2 animate-pulse" style={{animationDelay: '1s'}}>15M+</div>
+              <div className="text-white/90 font-medium">Registrations Processed</div>
+            </div>
+            <div className="text-center transform hover:scale-110 transition-transform duration-300 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2 animate-pulse" style={{animationDelay: '1.5s'}}>99.9%</div>
+              <div className="text-white/90 font-medium">Uptime Guarantee</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white/70 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent-50 rounded-full border border-accent-200 mb-4">
+              <svg className="w-5 h-5 text-accent-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-sm font-semibold text-accent-700">Loved by Event Professionals</span>
+            </div>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              What Our Users Say
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 animate-slide-up" style={{animationDelay: '0.1s'}}>
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;EventReg transformed how we manage our conferences. The attendee check-in system alone saved us hours of manual work.&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold">SM</div>
+                <div>
+                  <div className="font-semibold text-gray-900">Sarah Martinez</div>
+                  <div className="text-sm text-gray-600">Conference Director</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;The analytics dashboard gives us real-time insights into our events. We can make data-driven decisions instantly.&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-secondary-500 rounded-full flex items-center justify-center text-white font-bold">JC</div>
+                <div>
+                  <div className="font-semibold text-gray-900">James Chen</div>
+                  <div className="text-sm text-gray-600">Event Manager</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 animate-slide-up" style={{animationDelay: '0.3s'}}>
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;Best investment we made. The payment integration is seamless and our attendees love the mobile experience.&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-accent-500 rounded-full flex items-center justify-center text-white font-bold">EP</div>
+                <div>
+                  <div className="font-semibold text-gray-900">Emily Parker</div>
+                  <div className="text-sm text-gray-600">Festival Organizer</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -195,13 +195,13 @@ export default function AttendeesManagementPage() {
       <header className="bg-white shadow-sm border-b border-green-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Attendee Management</h1>
-              <p className="text-gray-600">Manage event attendees</p>
-            </div>
-            <Link href="/dashboard" className="btn-outline">
-              ← Back to Dashboard
-            </Link>
+            <h1 className="text-2xl font-bold text-gray-900">Attendee Management</h1>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ← Back
+            </button>
           </div>
         </div>
       </header>

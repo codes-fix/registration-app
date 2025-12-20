@@ -76,14 +76,18 @@ export default function OrganizerEventsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
       <header className="bg-white shadow-sm border-b border-green-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">My Events</h1>
-            <p className="text-gray-600">Create, review, and manage your events</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="btn-outline">← Dashboard</Link>
-            <Link href="/events/create" className="btn-primary">+ Create Event</Link>
+            <div className="flex items-center gap-3">
+              <Link href="/events/create" className="btn-primary">+ Create Event</Link>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                ← Back
+              </button>
+            </div>
           </div>
         </div>
       </header>
