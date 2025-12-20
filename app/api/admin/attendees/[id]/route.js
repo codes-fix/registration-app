@@ -18,9 +18,8 @@ export async function PATCH(request, { params }) {
   try {
     const { id } = await params
     const body = await request.json()
-    const { action, notes } = body // action: 'approve', 'reject', or 'edit'
 
-    // Check authentication using server client
+    // Check authentication
     const serverClient = await createServerClient()
     const { data: { user }, error: userError } = await serverClient.auth.getUser()
     
@@ -40,31 +39,18 @@ export async function PATCH(request, { params }) {
       return Response.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Handle different actions
-    let updateData = {
+    // Update profile
+    const updateData = {
       updated_at: new Date().toISOString()
     }
 
-    if (action === 'approve') {
-      updateData.approval_status = 'approved'
-      updateData.approved_by = user.id
-      updateData.approved_at = new Date().toISOString()
-    } else if (action === 'reject') {
-      updateData.approval_status = 'rejected'
-      updateData.approved_by = user.id
-      updateData.approved_at = new Date().toISOString()
-      if (notes) {
-        updateData.approval_notes = notes
-      }
-    } else if (action === 'edit') {
-      // Update organizer details
-      if (body.email) updateData.email = body.email
-      if (body.first_name) updateData.first_name = body.first_name
-      if (body.last_name) updateData.last_name = body.last_name
-      if (body.phone !== undefined) updateData.phone = body.phone
-      if (body.company !== undefined) updateData.company = body.company
-      if (body.job_title !== undefined) updateData.job_title = body.job_title
-    }
+    if (body.email) updateData.email = body.email
+    if (body.first_name) updateData.first_name = body.first_name
+    if (body.last_name) updateData.last_name = body.last_name
+    if (body.phone !== undefined) updateData.phone = body.phone
+    if (body.company !== undefined) updateData.company = body.company
+    if (body.job_title !== undefined) updateData.job_title = body.job_title
+    if (body.is_active !== undefined) updateData.is_active = body.is_active
 
     const { data, error } = await adminClient
       .from('user_profiles')
@@ -74,18 +60,16 @@ export async function PATCH(request, { params }) {
       .single()
 
     if (error) {
-      console.error('Error updating organizer:', error)
+      console.error('Error updating attendee:', error)
       return Response.json({ error: error.message }, { status: 500 })
     }
 
     // Update auth email if changed
-    if (action === 'edit' && body.email && body.email !== data.email) {
+    if (body.email && body.email !== data.email) {
       await adminClient.auth.admin.updateUserById(id, {
         email: body.email
       })
     }
-
-    // TODO: Send email notification to organizer
 
     return Response.json({ data })
   } catch (err) {

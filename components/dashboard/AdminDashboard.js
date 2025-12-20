@@ -22,9 +22,10 @@ export default function AdminDashboard({ user, profile }) {
 
 const navigation = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Organizers', href: '/admin/organizers' },  // NEW
+  { label: 'Organizers', href: '/admin/organizers' },
+  { label: 'Admins', href: '/admin/admins' },
+  { label: 'Attendees', href: '/admin/attendees' },
   { label: 'Events', href: '/events' },
-  { label: 'Users', href: '/admin/users' },
   { label: 'Reports', href: '/admin/reports' }
 ]
 
@@ -109,18 +110,27 @@ const loadData = async () => {
     <DashboardLayout user={user} profile={profile} navigation={navigation}>
       <div className="space-y-8">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl shadow-xl p-8 text-white">
-          <div className="flex items-center justify-between">
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-secondary-500 rounded-2xl shadow-2xl p-8 text-white">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -ml-24 -mb-24"></div>
+          <div className="relative flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold mb-2">
-                Welcome back, {profile.first_name}! 👋
-              </h2>
-              <p className="text-primary-100 text-lg">
-                Here&apos;s what&apos;s happening with your events today.
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 className="text-4xl font-bold">
+                  Welcome back, {profile.first_name}!
+                </h2>
+              </div>
+              <p className="text-white/90 text-lg ml-15">
+                Manage your platform and monitor event performance in real-time.
               </p>
             </div>
-            <Link href="/events/create" className="bg-white text-primary-600 hover:bg-primary-50 font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <Link href="/events/create" className="bg-white text-primary-600 hover:bg-white/90 font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:shadow-2xl hover:-translate-y-1 flex items-center gap-2 group">
+              <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Create Event
@@ -174,8 +184,10 @@ const loadData = async () => {
           <div className="bg-gradient-to-br from-white to-primary-50 rounded-xl shadow-lg border border-primary-100">
             <div className="p-6 border-b border-primary-100/50">
               <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                <span className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center mr-3">
-                  ⚡
+                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white flex items-center justify-center mr-3 shadow-md">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </span>
                 Quick Actions
               </h3>
@@ -184,6 +196,14 @@ const loadData = async () => {
               <Link href="/admin/organizers" className="group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary-200 hover:border-primary-400 bg-white hover:bg-primary-50 transition-all duration-200 hover:shadow-md">
                 <UsersIcon className="w-8 h-8 text-primary-600 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-semibold text-gray-700 text-center">Manage Organizers</span>
+              </Link>
+              <Link href="/admin/admins" className="group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-purple-200 hover:border-purple-400 bg-white hover:bg-purple-50 transition-all duration-200 hover:shadow-md">
+                <UsersIcon className="w-8 h-8 text-purple-600 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-semibold text-gray-700 text-center">Manage Admins</span>
+              </Link>
+              <Link href="/admin/attendees" className="group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-blue-200 hover:border-blue-400 bg-white hover:bg-blue-50 transition-all duration-200 hover:shadow-md">
+                <UsersIcon className="w-8 h-8 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-semibold text-gray-700 text-center">Manage Attendees</span>
               </Link>
               <Link href="/events/create" className="group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-secondary-200 hover:border-secondary-400 bg-white hover:bg-secondary-50 transition-all duration-200 hover:shadow-md">
                 <EventIcon className="w-8 h-8 text-secondary-600 mb-2 group-hover:scale-110 transition-transform" />
@@ -205,8 +225,10 @@ const loadData = async () => {
   <div className="p-6 border-b border-secondary-100/50">
     <div className="flex items-center justify-between">
       <h3 className="text-xl font-bold text-gray-900 flex items-center">
-        <span className="w-8 h-8 rounded-lg bg-secondary text-white flex items-center justify-center mr-3">
-          📊
+        <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-secondary-500 to-secondary-600 text-white flex items-center justify-center mr-3 shadow-md">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
         </span>
         Recent Registrations
       </h3>
@@ -277,8 +299,10 @@ const loadData = async () => {
           <div className="p-6 border-b border-accent-100/50">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-900 flex items-center">
-                <span className="w-8 h-8 rounded-lg bg-accent text-white flex items-center justify-center mr-3">
-                  📅
+                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white flex items-center justify-center mr-3 shadow-md">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </span>
                 Upcoming Events
               </h3>
