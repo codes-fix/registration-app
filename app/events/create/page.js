@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
-import { createClient } from '@/lib/supabase/client'
 
 export default function CreateEventPage() {
   const router = useRouter()
@@ -68,8 +67,6 @@ export default function CreateEventPage() {
         return
       }
 
-      const supabase = createClient()
-      
       // Prepare event data
       const eventData = {
         ...formData,
@@ -87,18 +84,23 @@ export default function CreateEventPage() {
         }
       })
 
-      const { data, error } = await supabase
-        .from('events')
-        .insert([eventData])
-        .select()
-        .single()
+      // Use server API so service role can bypass RLS and apply role-based logic
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(eventData)
+      })
 
-      if (error) {
-        throw error
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}))
+        throw new Error(errBody.error || 'Failed to create event')
       }
 
-      // Redirect to event management page
-      router.push(`/events/${data.id}/manage`)
+      const { event } = await response.json()
+
+      // Redirect to event edit/management page
+      router.push(`/events/${event.id}/edit`)
     } catch (error) {
       console.error('Error creating event:', error)
       alert('Failed to create event. Please try again.')

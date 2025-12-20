@@ -22,7 +22,7 @@ export default function AdminDashboard({ user, profile }) {
 const navigation = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Organizers', href: '/admin/organizers' },  // NEW
-  { label: 'Events', href: '/admin/events' },
+  { label: 'Events', href: '/events' },
   { label: 'Users', href: '/admin/users' },
   { label: 'Reports', href: '/admin/reports' }
 ]
