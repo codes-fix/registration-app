@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { ArrowLeftIcon } from '@/components/ui/Icons'
 
 export default function EditEventPage() {
   const params = useParams()
@@ -12,6 +14,7 @@ export default function EditEventPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [eventData, setEventData] = useState(null)
+  const [userRole, setUserRole] = useState(null)
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -23,12 +26,23 @@ export default function EditEventPage() {
     country: '',
     capacity: '',
     banner_url: '',
-    status: 'draft'
+    status: 'draft',
+    is_virtual: false,
+    virtual_platform: '',
+    virtual_url: ''
   })
 
   useEffect(() => {
     const load = async () => {
       try {
+        const user = await getCurrentUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
+        const profile = await getUserProfile(user.id)
+        setUserRole(profile?.role)
+
         const res = await fetch(`/api/events/${params.id}`, { credentials: 'include' })
         if (res.status === 401) {
           router.push('/login')
@@ -55,7 +69,10 @@ export default function EditEventPage() {
           country: event.country || '',
           capacity: event.capacity ?? '',
           banner_url: event.banner_url || '',
-          status: event.status || 'draft'
+          status: event.status || 'draft',
+          is_virtual: event.is_virtual || false,
+          virtual_platform: event.virtual_platform || '',
+          virtual_url: event.virtual_url || ''
         })
       } catch (err) {
         setError('Error loading event')
@@ -67,8 +84,8 @@ export default function EditEventPage() {
   }, [params.id, router])
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
   }
 
   const handleSubmit = async (e) => {
@@ -87,7 +104,10 @@ export default function EditEventPage() {
         country: form.country,
         capacity: form.capacity === '' ? null : Number(form.capacity),
         banner_url: form.banner_url,
-        status: form.status
+        status: form.status,
+        is_virtual: form.is_virtual,
+        virtual_platform: form.virtual_platform,
+        virtual_url: form.virtual_url
       }
 
       const res = await fetch(`/api/events/${params.id}`, {
@@ -112,31 +132,39 @@ export default function EditEventPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-yellow-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
         <LoadingSpinner size="lg" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
-      <header className="bg-white shadow-sm border-b border-green-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Edit Event</h1>
-            {eventData && (
-              <p className="text-sm text-gray-600">Current status: {eventData.status}</p>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100">
+      <header className="bg-white shadow-md border-b border-primary-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center gap-4">
+            <Link href={userRole === 'admin' ? '/events' : '/organizer/events'} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Edit Event
+              </h1>
+              {eventData && (
+                <p className="text-gray-600 mt-1">Current status: <span className="font-medium">{eventData.status}</span></p>
+              )}
+            </div>
           </div>
-          <Link href={`/events/${params.id}`} className="text-primary hover:text-primary-600 text-sm font-medium">
-            ← Back to event
-          </Link>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm border border-green-100 p-6">
-          {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -186,48 +214,90 @@ export default function EditEventPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Venue</label>
-                <input
-                  type="text"
-                  name="venue"
-                  value={form.venue}
-                  onChange={handleChange}
-                  className="input"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  className="input"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}
-                  className="input"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={form.country}
-                  onChange={handleChange}
-                  className="input"
-                />
-              </div>
+            {/* Virtual Event Toggle */}
+            <div className="flex items-center gap-3 mb-2">
+              <input
+                type="checkbox"
+                id="is_virtual"
+                name="is_virtual"
+                checked={form.is_virtual}
+                onChange={handleChange}
+                className="w-5 h-5 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
+              />
+              <label htmlFor="is_virtual" className="text-sm font-medium text-gray-700">
+                This is a virtual event
+              </label>
             </div>
+
+            {form.is_virtual ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Virtual Platform</label>
+                  <input
+                    type="text"
+                    name="virtual_platform"
+                    value={form.virtual_platform}
+                    onChange={handleChange}
+                    placeholder="Zoom, Google Meet, Teams, etc."
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Virtual Event URL</label>
+                  <input
+                    type="url"
+                    name="virtual_url"
+                    value={form.virtual_url}
+                    onChange={handleChange}
+                    placeholder="https://zoom.us/j/..."
+                    className="input"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Venue</label>
+                  <input
+                    type="text"
+                    name="venue"
+                    value={form.venue}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={form.address}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    value={form.country}
+                    onChange={handleChange}
+                    className="input"
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -273,15 +343,20 @@ export default function EditEventPage() {
               </div>
             )}
 
-            <div className="flex items-center gap-3">
+            <div className="border-t pt-6 flex gap-3">
               <button
                 type="submit"
                 disabled={saving}
-                className="btn-primary"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
-              <Link href={`/events/${params.id}`} className="btn-secondary">Cancel</Link>
+              <Link 
+                href={userRole === 'admin' ? '/events' : '/organizer/events'}
+                className="px-6 py-3 bg-white text-gray-700 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all font-medium text-center"
+              >
+                Cancel
+              </Link>
             </div>
           </form>
         </div>

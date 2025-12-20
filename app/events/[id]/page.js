@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function EventDetailsPage() {
@@ -14,6 +14,7 @@ export default function EventDetailsPage() {
   const [ticketTypes, setTicketTypes] = useState([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
+  const [userRole, setUserRole] = useState(null)
   const [registering, setRegistering] = useState(false)
   const [selectedTickets, setSelectedTickets] = useState({})
 
@@ -22,6 +23,10 @@ export default function EventDetailsPage() {
       try {
         const currentUser = await getCurrentUser()
         setUser(currentUser)
+        if (currentUser) {
+          const profile = await getUserProfile(currentUser.id)
+          setUserRole(profile?.role)
+        }
         await loadEvent()
       } catch (error) {
         console.error('Error loading data:', error)
@@ -190,7 +195,10 @@ export default function EventDetailsPage() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-green-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/events" className="text-primary hover:text-primary-600 font-medium">
+          <Link 
+            href={userRole === 'organizer' ? '/organizer/events' : '/events'} 
+            className="text-primary hover:text-primary-600 font-medium"
+          >
             ← Back to Events
           </Link>
         </div>

@@ -80,6 +80,7 @@ export async function GET(request) {
         id, name, slug, description, start_date, end_date,
         venue, address, city, country, capacity, status,
         banner_url, approval_status, approval_notes,
+        is_virtual, virtual_platform, virtual_url,
         created_by, created_at, updated_at
       `)
       .order('created_at', { ascending: false })
@@ -104,8 +105,10 @@ export async function GET(request) {
         query = query.eq('approval_status', 'rejected')
       }
     } else {
-      // Attendees see only published events
-      query = query.in('status', ['published', 'registration_open'])
+      // Attendees see only approved and published events
+      query = query
+        .eq('approval_status', 'approved')
+        .eq('status', 'published')
     }
 
     // Apply search filter

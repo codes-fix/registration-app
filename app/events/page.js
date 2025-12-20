@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { CalendarIcon, LocationIcon, UserIcon, SearchIcon, PlusIcon, EditIcon, TrashIcon, EyeIcon, CheckCircleIcon } from '@/components/ui/Icons'
 
 export default function EventsPage() {
   const [events, setEvents] = useState([])
@@ -121,7 +122,7 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -133,22 +134,26 @@ export default function EventsPage() {
   const description = isAdmin ? 'Review and manage all events' : isOrganizer ? 'Create and manage your events' : 'Discover and register for amazing events'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-green-100">
+      <header className="bg-white shadow-md border-b border-primary-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-              <p className="text-gray-600 mt-1">{description}</p>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">{title}</h1>
+              <p className="text-gray-600 mt-1 font-medium">{description}</p>
             </div>
-            <div className="mt-4 md:mt-0 flex space-x-4">
-              <Link href="/dashboard" className="btn-outline">
-                ← Back to Dashboard
+            <div className="mt-4 md:mt-0 flex space-x-3">
+              <Link href="/dashboard" className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all font-medium">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
               </Link>
               {(isAdmin || isOrganizer) && (
-                <Link href="/events/create" className="btn-primary">
-                  + Create Event
+                <Link href="/events/create" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium">
+                  <PlusIcon className="w-5 h-5" />
+                  Create Event
                 </Link>
               )}
             </div>
@@ -158,25 +163,29 @@ export default function EventsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-green-100 p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <SearchIcon className="w-4 h-4 text-gray-500" />
                 Search Events
               </label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search by title or description..."
-                className="input"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  placeholder="Search by title or description..."
+                  className="input pl-10"
+                />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              </div>
             </div>
 
             {/* Admin and Organizer filters */}
             {(isAdmin || isOrganizer) && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   {isAdmin ? 'Approval Status' : 'Status'}
                 </label>
                 <select
@@ -206,18 +215,19 @@ export default function EventsPage() {
 
         {/* Events List/Grid */}
         {events.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No events found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 text-center py-16 px-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+              <CalendarIcon className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-base font-semibold text-gray-900">No events found</h3>
+            <p className="mt-2 text-sm text-gray-500">
               {isOrganizer ? 'Create your first event to get started.' : 'Try adjusting your search filters.'}
             </p>
             {isOrganizer && (
               <div className="mt-6">
-                <Link href="/events/create" className="btn-primary">
-                  + Create Event
+                <Link href="/events/create" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 hover:shadow-lg transition-all duration-200 font-medium">
+                  <PlusIcon className="w-5 h-5" />
+                  Create Event
                 </Link>
               </div>
             )}
@@ -225,37 +235,37 @@ export default function EventsPage() {
         ) : (
           <div className="space-y-4">
             {events.map((event) => (
-              <div key={event.id} className="bg-white rounded-lg shadow-sm border border-green-100 p-6">
+              <div key={event.id} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
+                      <div className="p-2 bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg group-hover:from-primary-200 group-hover:to-primary-100 transition-colors">
+                        <CalendarIcon className="w-4 h-4 text-primary-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">{event.name || event.title}</h3>
                       {isAdmin && event.approval_status && (
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getApprovalStatusColor(event.approval_status)}`}>
+                        <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getApprovalStatusColor(event.approval_status)}`}>
                           {event.approval_status.replace('_', ' ')}
                         </span>
                       )}
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
                         event.is_virtual ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
                       }`}>
                         {event.is_virtual ? 'Virtual' : 'In-Person'}
                       </span>
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-3">{event.description}</p>
+                    <p className="text-gray-600 text-sm mb-3 ml-11">{event.description}</p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span className="flex items-center">
-                        📅 {formatDate(event.start_date)}
+                    <div className="flex items-center gap-4 text-sm text-gray-600 ml-11">
+                      <span className="flex items-center gap-1.5">
+                        <CalendarIcon className="w-4 h-4 text-gray-400" />
+                        {formatDate(event.start_date)}
                       </span>
-                      <span className="flex items-center">
-                        📍 {event.is_virtual ? event.virtual_platform || 'Online' : event.venue_name || 'TBA'}
+                      <span className="flex items-center gap-1.5">
+                        <LocationIcon className="w-4 h-4 text-gray-400" />
+                        {event.is_virtual ? event.virtual_platform || 'Online' : event.venue || 'TBA'}
                       </span>
-                      {isAdmin && event.organizer && (
-                        <span className="flex items-center">
-                          👤 {event.organizer.first_name} {event.organizer.last_name}
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -263,25 +273,28 @@ export default function EventsPage() {
                   <div className="ml-4 flex flex-col gap-2">
                     <Link
                       href={`/events/${event.id}`}
-                      className="text-primary hover:text-primary-600 text-sm font-medium"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 hover:shadow-md transition-all text-sm font-medium"
                     >
-                      View Details
+                      <EyeIcon className="w-4 h-4" />
+                      View
                     </Link>
 
-                    {(isAdmin || (isOrganizer && event.organizer_id === user?.id)) && (
+                    {(isAdmin || (isOrganizer && event.created_by === user?.id)) && (
                       <>
                         <Link
                           href={`/events/${event.id}/edit`}
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 hover:shadow-md transition-all text-sm font-medium"
                         >
+                          <EditIcon className="w-4 h-4" />
                           Edit
                         </Link>
 
                         {event.status === 'draft' && (
                           <button
                             onClick={() => handleDeleteEvent(event.id)}
-                            className="text-red-600 hover:text-red-700 text-sm font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 hover:shadow-md transition-all text-sm font-medium"
                           >
+                            <TrashIcon className="w-4 h-4" />
                             Delete
                           </button>
                         )}
@@ -291,9 +304,10 @@ export default function EventsPage() {
                     {isAdmin && event.approval_status === 'pending_approval' && (
                       <Link
                         href={`/events/${event.id}/approve`}
-                        className="text-green-600 hover:text-green-700 text-sm font-medium"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 hover:shadow-md transition-all text-sm font-medium"
                       >
-                        Review Approval
+                        <CheckCircleIcon className="w-4 h-4" />
+                        Review
                       </Link>
                     )}
                   </div>

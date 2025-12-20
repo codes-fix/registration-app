@@ -101,72 +101,104 @@ function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-green-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200 rounded-full opacity-20 blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200 rounded-full opacity-20 blur-3xl"></div>
+      
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/">
             <div className="inline-flex items-center justify-center mb-6 cursor-pointer group">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary via-secondary to-accent rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <span className="text-4xl">🎫</span>
+              <div className="w-20 h-20 bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300">
+                <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
               </div>
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-3">EventReg</h1>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-accent-600 bg-clip-text text-transparent mb-3">EventReg</h1>
           </Link>
-          <p className="text-gray-600 text-lg">Create your free account</p>
+          <p className="text-gray-700 text-lg font-medium">Create your free account</p>
         </div>
 
         {/* Role Selection */}
-        <div className="card p-6 mb-4">
+        <div className="bg-white rounded-xl p-6 mb-4 shadow-lg border border-gray-100">
           <h3 className="text-sm font-semibold text-gray-900 mb-3">I want to register as:</h3>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setSelectedRole('attendee')}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-all hover:shadow-md ${
                 selectedRole === 'attendee'
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-white shadow-md'
+                  : 'border-gray-200 hover:border-primary-200'
               }`}
             >
-              <div className="text-2xl mb-2">🎯</div>
-              <div className="font-semibold text-sm">Attendee</div>
+              <div className="mb-2">
+                <svg className={`w-8 h-8 mx-auto ${
+                  selectedRole === 'attendee' ? 'text-primary-600' : 'text-gray-400'
+                }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className={`font-semibold text-sm ${
+                selectedRole === 'attendee' ? 'text-primary-700' : 'text-gray-700'
+              }`}>Attendee</div>
               <div className="text-xs text-gray-500 mt-1">Register for events</div>
             </button>
 
             <button
               type="button"
               onClick={() => setSelectedRole('organizer')}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-4 rounded-xl border-2 transition-all hover:shadow-md ${
                 selectedRole === 'organizer'
-                  ? 'border-secondary bg-secondary/5 text-secondary'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-secondary-500 bg-gradient-to-br from-secondary-50 to-white shadow-md'
+                  : 'border-gray-200 hover:border-secondary-200'
               }`}
             >
-              <div className="text-2xl mb-2">👨‍💼</div>
-              <div className="font-semibold text-sm">Organizer</div>
+              <div className="mb-2">
+                <svg className={`w-8 h-8 mx-auto ${
+                  selectedRole === 'organizer' ? 'text-secondary-600' : 'text-gray-400'
+                }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className={`font-semibold text-sm ${
+                selectedRole === 'organizer' ? 'text-secondary-700' : 'text-gray-700'
+              }`}>Organizer</div>
               <div className="text-xs text-gray-500 mt-1">Create & manage events</div>
             </button>
           </div>
 
           {selectedRole === 'organizer' && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-xs text-yellow-800">
-                <strong>Note:</strong> Organizer accounts require admin approval before you can create events.
-              </p>
+            <div className="mt-4 p-3 bg-gradient-to-r from-yellow-50 to-secondary-50 border border-yellow-200 rounded-xl">
+              <div className="flex items-start gap-2">
+                <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="text-xs text-yellow-800">
+                  <strong>Note:</strong> Organizer accounts require admin approval before you can create events.
+                </p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-xl shadow-md">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm text-red-800 font-medium">{error}</p>
+            </div>
           </div>
         )}
 
         {/* Registration Form */}
-        <div className="card p-8 shadow-2xl">
+        <div className="bg-white rounded-2xl p-8 shadow-2xl border border-gray-100 backdrop-blur-sm">
           {/* Google Sign-In */}
 {/* Google Sign-In */}
 <button
@@ -290,9 +322,9 @@ function RegisterForm() {
 
         {/* Sign In Link */}
         <div className="text-center mt-6">
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Already have an account?{' '}
-            <Link href="/login" className="text-secondary font-bold hover:underline">
+            <Link href="/login" className="text-secondary-600 font-bold hover:text-secondary-700 hover:underline transition-colors">
               Sign in →
             </Link>
           </p>
