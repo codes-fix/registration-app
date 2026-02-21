@@ -44,6 +44,17 @@ export async function POST(request) {
       )
     }
 
+    // Auto-confirm user email so they can login immediately
+    const { error: confirmError } = await supabase.auth.admin.updateUserById(
+      userId,
+      { email_confirm: true }
+    )
+
+    if (confirmError) {
+      console.error('Email confirmation error:', confirmError)
+      // Don't fail the request, just log the error
+    }
+
     return NextResponse.json({ organization: orgData })
 
   } catch (error) {
