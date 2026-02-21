@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import Link from 'next/link'
-
+ 
 export default function AdminsManagementPage() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
