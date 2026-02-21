@@ -2,12 +2,29 @@
 // Auto-generated from Supabase schema
 
 export type UserRole = 
+  | 'super_admin'
+  | 'management'
   | 'attendee'
   | 'speaker'
   | 'staff'
   | 'volunteer'
   | 'guest'
   | 'admin';
+
+export type SubscriptionStatus =
+  | 'trialing'
+  | 'active'
+  | 'past_due'
+  | 'canceled'
+  | 'incomplete'
+  | 'incomplete_expired'
+  | 'unpaid';
+
+export type SubscriptionPlan =
+  | 'free'
+  | 'starter'
+  | 'professional'
+  | 'enterprise';
 
 export type EventStatus = 
   | 'draft'
@@ -49,6 +66,37 @@ export type CheckinStatus =
   | 'checked_out'
   | 'no_show';
 
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  business_type?: string;
+  logo_url?: string;
+  description?: string;
+  website?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postal_code?: string;
+  subscription_status: SubscriptionStatus;
+  subscription_plan: SubscriptionPlan;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  subscription_start_date?: string;
+  subscription_end_date?: string;
+  trial_ends_at?: string;
+  max_events: number;
+  max_attendees_per_event: number;
+  max_team_members: number;
+  is_active: boolean;
+  settings?: Record<string, any>;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -60,6 +108,10 @@ export interface UserProfile {
   bio?: string;
   profile_image_url?: string;
   role: UserRole;
+  organization_id?: string;
+  is_organization_owner: boolean;
+  position?: string;
+  department?: string;
   is_active: boolean;
   dietary_restrictions?: string[];
   accessibility_needs?: string[];
@@ -307,6 +359,33 @@ export interface SurveyResponse {
   registration_id: string;
   responses: Record<string, any>;
   submitted_at: string;
+}
+
+export interface SubscriptionHistory {
+  id: string;
+  organization_id: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  amount: number;
+  currency: string;
+  billing_period_start?: string;
+  billing_period_end?: string;
+  stripe_invoice_id?: string;
+  stripe_payment_intent_id?: string;
+  paid_at?: string;
+  created_at: string;
+}
+
+export interface OrganizationInvitation {
+  id: string;
+  organization_id: string;
+  email: string;
+  role: UserRole;
+  invited_by?: string;
+  token: string;
+  expires_at: string;
+  accepted_at?: string;
+  created_at: string;
 }
 
 // Utility types for forms and API responses
