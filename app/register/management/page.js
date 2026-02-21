@@ -538,7 +538,7 @@ export default function ManagementRegisterPage() {
 
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-2">Start Your Free Trial</h2>
-                <p className="text-sm text-gray-600 mb-4">No payment required now. You'll be notified before your trial ends.</p>
+                <p className="text-sm text-gray-600 mb-4">No payment required now. You will be notified before your trial ends.</p>
                 
                 {/* Free Trial Notice */}
                 <div className="border-2 border-green-500 bg-green-50 rounded-lg p-6 mb-4">
