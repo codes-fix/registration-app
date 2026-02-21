@@ -12,32 +12,46 @@ VALUES ('site-logos', 'site-logos', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Set up RLS policies for organization logos
-CREATE POLICY IF NOT EXISTS "Authenticated users can upload organization logos"
+-- Drop existing policies first
+DROP POLICY IF EXISTS "Authenticated users can upload organization logos" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view organization logos" ON storage.objects;
+DROP POLICY IF EXISTS "Organization owners can update logos" ON storage.objects;
+DROP POLICY IF EXISTS "Organization owners can delete logos" ON storage.objects;
+
+-- Create policies
+CREATE POLICY "Authenticated users can upload organization logos"
 ON storage.objects
 FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'organization-logos');
 
-CREATE POLICY IF NOT EXISTS "Anyone can view organization logos"
+CREATE POLICY "Anyone can view organization logos"
 ON storage.objects
 FOR SELECT
 TO public
 USING (bucket_id = 'organization-logos');
 
-CREATE POLICY IF NOT EXISTS "Organization owners can update logos"
+CREATE POLICY "Organization owners can update logos"
 ON storage.objects
 FOR UPDATE
 TO authenticated
 USING (bucket_id = 'organization-logos');
 
-CREATE POLICY IF NOT EXISTS "Organization owners can delete logos"
+CREATE POLICY "Organization owners can delete logos"
 ON storage.objects
 FOR DELETE
 TO authenticated
 USING (bucket_id = 'organization-logos');
 
 -- 4. Set up RLS policies for site logos (super admin only)
-CREATE POLICY IF NOT EXISTS "Super admins can upload site logos"
+-- Drop existing policies first
+DROP POLICY IF EXISTS "Super admins can upload site logos" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view site logos" ON storage.objects;
+DROP POLICY IF EXISTS "Super admins can update site logos" ON storage.objects;
+DROP POLICY IF EXISTS "Super admins can delete site logos" ON storage.objects;
+
+-- Create policies
+CREATE POLICY "Super admins can upload site logos"
 ON storage.objects
 FOR INSERT
 TO authenticated
@@ -48,13 +62,13 @@ WITH CHECK (
   )
 );
 
-CREATE POLICY IF NOT EXISTS "Anyone can view site logos"
+CREATE POLICY "Anyone can view site logos"
 ON storage.objects
 FOR SELECT
 TO public
 USING (bucket_id = 'site-logos');
 
-CREATE POLICY IF NOT EXISTS "Super admins can update site logos"
+CREATE POLICY "Super admins can update site logos"
 ON storage.objects
 FOR UPDATE
 TO authenticated
@@ -65,7 +79,7 @@ USING (
   )
 );
 
-CREATE POLICY IF NOT EXISTS "Super admins can delete site logos"
+CREATE POLICY "Super admins can delete site logos"
 ON storage.objects
 FOR DELETE
 TO authenticated
@@ -96,6 +110,11 @@ ON CONFLICT DO NOTHING;
 -- RLS for site_settings
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Anyone can view site settings" ON site_settings;
+DROP POLICY IF EXISTS "Super admins can update site settings" ON site_settings;
+
+-- Create policies
 CREATE POLICY "Anyone can view site settings"
 ON site_settings
 FOR SELECT
