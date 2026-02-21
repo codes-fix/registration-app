@@ -74,8 +74,6 @@ export default function SettingsPage() {
       setLoading(false)
     }
   }
-    }
-  }
 
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target
