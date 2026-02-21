@@ -103,7 +103,7 @@ export default function PendingApprovalPage() {
               )}
               <div className="space-y-3">
                 <p className="text-sm text-gray-600">
-                  You can still use EventReg as an attendee to browse and register for events.
+                  You can still use At The Roc as an attendee to browse and register for events.
                 </p>
                 <Link href="/events" className="btn-primary w-full">
                   Browse Events

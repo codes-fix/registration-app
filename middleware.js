@@ -110,7 +110,7 @@ export async function middleware(request) {
 
     // Admin routes
     if (adminRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
-      if (userRole !== 'admin') {
+      if (!['admin', 'super_admin'].includes(userRole)) {
         return NextResponse.redirect(new URL('/unauthorized', request.url))
       }
     }

@@ -258,7 +258,7 @@ export default function ManagementRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200 rounded-full opacity-20 blur-3xl"></div>
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200 rounded-full opacity-20 blur-3xl"></div>
@@ -284,8 +284,8 @@ export default function ManagementRegisterPage() {
                 </div>
               )}
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-600 via-secondary-600 to-accent-600 bg-clip-text text-transparent mb-2">
-              EventReg
+            <h1 className="text-4xl font-bold text-primary mb-2">
+              At The Roc
             </h1>
           </Link>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Create Your Business Account</h2>

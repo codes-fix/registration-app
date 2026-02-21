@@ -40,18 +40,12 @@ export async function GET() {
     // Get all stats using admin client (bypasses RLS)
     const [
       { count: totalUsersCount, error: usersError },
-      { count: pendingOrganizersCount, error: orgError },
       { data: eventsData, error: eventsError },
       { data: registrationsRaw, error: regError }
     ] = await Promise.all([
       adminClient
         .from('user_profiles')
         .select('*', { count: 'exact', head: true }),
-      adminClient
-        .from('user_profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'organizer')
-        .eq('approval_status', 'pending_approval'),
       adminClient
         .from('events')
         .select('*'),
@@ -64,9 +58,6 @@ export async function GET() {
 
     if (usersError) {
       console.error('Error loading users count:', usersError)
-    }
-    if (orgError) {
-      console.error('Error loading pending organizers:', orgError)
     }
     if (eventsError) {
       console.error('Error loading events:', eventsError)
@@ -129,7 +120,6 @@ export async function GET() {
 
     return Response.json({
       totalUsers: totalUsersCount || 0,
-      pendingOrganizers: pendingOrganizersCount || 0,
       totalEvents: allEvents.length,
       activeEvents,
       upcomingEvents: upcomingEventsCount,

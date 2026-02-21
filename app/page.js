@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
+import { useSiteLogo } from '@/lib/hooks/useLogo'
 import { TicketIcon, MoneyIcon, CheckCircleIcon, ChartIcon, CalendarIcon, UserIcon, SearchIcon, LocationIcon } from '@/components/ui/Icons'
 
 export default function HomePage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { logo: siteLogo } = useSiteLogo()
 
   useEffect(() => {
     async function checkAuth() {
@@ -32,10 +34,18 @@ export default function HomePage() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
-                  <TicketIcon className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent cursor-pointer">EventReg</h1>
+                {siteLogo ? (
+                  <img 
+                    src={siteLogo} 
+                    alt="At The Roc Logo" 
+                    className="h-10 w-10 object-contain rounded-lg shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <TicketIcon className="w-6 h-6 text-white" />
+                  </div>
+                )}
+                <h1 className="text-2xl font-bold text-primary cursor-pointer">At The Roc</h1>
               </Link>
             </div>
 
@@ -359,7 +369,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-gray-700 mb-4 italic">
-                &quot;EventReg transformed how we manage our conferences. The attendee check-in system alone saved us hours of manual work.&quot;
+                &quot;At The Roc transformed how we manage our conferences. The attendee check-in system alone saved us hours of manual work.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold">SM</div>
@@ -424,7 +434,7 @@ export default function HomePage() {
             Ready to Transform Your Events?
           </h3>
           <p className="text-xl text-white/95 mb-8 font-medium">
-            Join thousands of event organizers who trust EventReg for their registration needs.
+            Join thousands of event organizers who trust At The Roc for their registration needs.
           </p>
           {!user && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -448,7 +458,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="text-lg font-semibold mb-4">EventReg</h4>
+              <h4 className="text-lg font-semibold mb-4">At The Roc</h4>
               <p className="text-gray-400 text-sm">
                 Professional event registration and management platform.
               </p>
@@ -482,7 +492,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            © 2025 EventReg. All rights reserved.
+            © 2025 At The Roc. All rights reserved.
           </div>
         </div>
       </footer>

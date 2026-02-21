@@ -137,7 +137,6 @@ export async function POST(request) {
           company,
           job_title,
           role: 'admin',
-          approval_status: 'approved',
           is_active: true,
           updated_at: new Date().toISOString()
         })
@@ -165,7 +164,6 @@ export async function POST(request) {
           company,
           job_title,
           role: 'admin',
-          approval_status: 'approved',
           is_active: true
         }])
         .select()

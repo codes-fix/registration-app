@@ -55,15 +55,12 @@ function ProfileSetupForm() {
       // If error is about missing profile, create one
       if (profileError.code === 'PGRST116') {
         // No profile exists, create initial one
-        const approvalStatus = storedRole === 'organizer' ? 'pending_approval' : 'approved'
-        
         const { error: insertError } = await supabase
           .from('user_profiles')
           .insert({
             id: currentUser.id,
             email: currentUser.email,
             role: storedRole,
-            approval_status: approvalStatus,
             is_active: true
           })
 
@@ -87,11 +84,6 @@ function ProfileSetupForm() {
 
     // Profile exists and is complete
     if (existingProfile && existingProfile.first_name && existingProfile.last_name) {
-      if (existingProfile.role === 'organizer' && existingProfile.approval_status === 'pending_approval') {
-        router.push('/pending-approval')
-        return
-      }
-      
       router.push('/dashboard')
       return
     }
@@ -150,9 +142,6 @@ function ProfileSetupForm() {
 
       const supabase = createClient()
       
-      // Determine approval status based on role
-      const approvalStatus = formData.role === 'organizer' ? 'pending_approval' : 'approved'
-      
       const profileData = {
         id: user.id,
         email: user.email,
@@ -162,7 +151,6 @@ function ProfileSetupForm() {
         company: formData.company.trim() || null,
         job_title: formData.job_title.trim() || null,
         role: formData.role,
-        approval_status: approvalStatus,
         is_active: true,
         updated_at: new Date().toISOString()
       }
@@ -184,12 +172,8 @@ function ProfileSetupForm() {
       
       await new Promise(resolve => setTimeout(resolve, 500))
       
-      // Redirect based on approval status
-      if (approvalStatus === 'pending_approval') {
-        router.push('/pending-approval')
-      } else {
-        router.push('/dashboard')
-      }
+      // Redirect to dashboard
+      router.push('/dashboard')
     } catch (err) {
       console.error('Profile setup error:', err)
       setError(err.message || 'Failed to complete profile setup. Please try again.')

@@ -43,12 +43,7 @@ export async function GET(request) {
           return NextResponse.redirect(`${origin}/profile/setup`)
         }
 
-        // Check approval status for organizers
-        if (profile.role === 'organizer' && profile.approval_status === 'pending_approval') {
-          return NextResponse.redirect(`${origin}/pending-approval`)
-        }
-
-        // Profile complete and approved
+        // Profile complete - redirect to dashboard
         return NextResponse.redirect(`${origin}/dashboard`)
       }
     } catch (err) {

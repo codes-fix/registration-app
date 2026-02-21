@@ -29,12 +29,6 @@ export default function DashboardPage() {
           return
         }
 
-        // Check if organizer pending approval
-        if (userProfile.role === 'organizer' && userProfile.approval_status === 'pending_approval') {
-          router.push('/pending-approval')
-          return
-        }
-
         setUser(currentUser)
         setProfile(userProfile)
       } catch (error) {
@@ -63,10 +57,14 @@ export default function DashboardPage() {
   const renderDashboard = () => {
     switch (profile.role) {
       case 'admin':
+      case 'super_admin':
         return <AdminDashboard user={user} profile={profile} />
       case 'organizer':
+      case 'management':
         return <OrganizerDashboard user={user} profile={profile} />
       case 'attendee':
+      case 'speaker':
+      case 'staff':
       default:
         return <AttendeeDashboard user={user} profile={profile} />
     }

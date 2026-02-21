@@ -17,6 +17,11 @@ export default function SettingsPage() {
   const [error, setError] = useState('')
   const [logoFile, setLogoFile] = useState(null)
   const [logoPreview, setLogoPreview] = useState(null)
+  const [siteColors, setSiteColors] = useState({
+    primary_color: '#22C55E',
+    secondary_color: '#EAB308',
+    accent_color: '#991B1B'
+  })
   const router = useRouter()
 
   const [passwordForm, setPasswordForm] = useState({
@@ -65,6 +70,26 @@ export default function SettingsPage() {
         setOrganization(orgData)
         if (orgData?.logo_url) {
           setLogoPreview(orgData.logo_url)
+        }
+      }
+
+      // Load site settings colors if super admin
+      if (userProfile?.role === 'super_admin') {
+        const supabase = createClient()
+        const { data: siteSettings } = await supabase
+          .from('site_settings')
+          .select('primary_color, secondary_color, accent_color, logo_url')
+          .single()
+        
+        if (siteSettings) {
+          setSiteColors({
+            primary_color: siteSettings.primary_color || '#22C55E',
+            secondary_color: siteSettings.secondary_color || '#EAB308',
+            accent_color: siteSettings.accent_color || '#991B1B'
+          })
+          if (siteSettings.logo_url && !logoPreview) {
+            setLogoPreview(siteSettings.logo_url)
+          }
         }
       }
     } catch (err) {
@@ -242,6 +267,35 @@ export default function SettingsPage() {
     }
   }
 
+  const handleColorUpdate = async () => {
+    setUpdating(true)
+    setError('')
+    setMessage('')
+
+    try {
+      const response = await fetch('/api/admin/site-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(siteColors),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to update colors')
+      }
+
+      setMessage('Site colors updated successfully! Refresh the page to see changes.')
+      setTimeout(() => setMessage(''), 5000)
+    } catch (err) {
+      console.error('Color update error:', err)
+      setError(err.message || 'Failed to update colors')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   const handleSignOut = async () => {
     try {
       await signOut()
@@ -254,14 +308,14 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50">
         <LoadingSpinner />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+    <div className="min-h-screen bg-primary-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
@@ -278,7 +332,7 @@ export default function SettingsPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
           <div className="px-8 py-6 border-b border-gray-200">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -399,6 +453,124 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Color Customization - For Super Admin Only */}
+            {profile?.role === 'super_admin' && (
+              <div className="border-t pt-8">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Site Color Customization</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Customize the color scheme of your application. Changes will be applied site-wide.
+                </p>
+                
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    {/* Primary Color */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Primary Color
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={siteColors.primary_color}
+                          onChange={(e) => setSiteColors({...siteColors, primary_color: e.target.value})}
+                          className="h-12 w-20 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={siteColors.primary_color}
+                          onChange={(e) => setSiteColors({...siteColors, primary_color: e.target.value})}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm uppercase"
+                          placeholder="#22C55E"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Main brand color</p>
+                    </div>
+
+                    {/* Secondary Color */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Secondary Color
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={siteColors.secondary_color}
+                          onChange={(e) => setSiteColors({...siteColors, secondary_color: e.target.value})}
+                          className="h-12 w-20 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={siteColors.secondary_color}
+                          onChange={(e) => setSiteColors({...siteColors, secondary_color: e.target.value})}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm uppercase"
+                          placeholder="#EAB308"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Complementary color</p>
+                    </div>
+
+                    {/* Accent Color */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Accent Color
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={siteColors.accent_color}
+                          onChange={(e) => setSiteColors({...siteColors, accent_color: e.target.value})}
+                          className="h-12 w-20 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={siteColors.accent_color}
+                          onChange={(e) => setSiteColors({...siteColors, accent_color: e.target.value})}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm uppercase"
+                          placeholder="#991B1B"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Highlight & alerts</p>
+                    </div>
+                  </div>
+
+                  {/* Color Preview */}
+                  <div className="border-t pt-4 mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-3">Preview</p>
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-16 h-16 rounded-lg shadow-md flex items-center justify-center text-white font-bold"
+                        style={{ backgroundColor: siteColors.primary_color }}
+                      >
+                        P
+                      </div>
+                      <div 
+                        className="w-16 h-16 rounded-lg shadow-md flex items-center justify-center text-white font-bold"
+                        style={{ backgroundColor: siteColors.secondary_color }}
+                      >
+                        S
+                      </div>
+                      <div 
+                        className="w-16 h-16 rounded-lg shadow-md flex items-center justify-center text-white font-bold"
+                        style={{ backgroundColor: siteColors.accent_color }}
+                      >
+                        A
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <button
+                    type="button"
+                    onClick={handleColorUpdate}
+                    disabled={updating}
+                    className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {updating ? 'Updating...' : 'Save Color Changes'}
+                  </button>
                 </div>
               </div>
             )}
