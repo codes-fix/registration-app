@@ -3,9 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getCurrentUser, getUserProfile } from '@/lib/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
 
 export default function SuperAdminUsersPage() {
+  const [currentUser, setCurrentUser] = useState(null)
+  const [currentProfile, setCurrentProfile] = useState(null)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -13,71 +17,62 @@ export default function SuperAdminUsersPage() {
   const [filter, setFilter] = useState('all') // all, pending, approved
   const router = useRouter()
 
+  const navigation = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Users', href: '/admin/users' },
+    { label: 'Organizers', href: '/admin/organizers' },
+    { label: 'Admins', href: '/admin/admins' },
+    { label: 'Attendees', href: '/admin/attendees' },
+    { label: 'Events', href: '/events' },
+    { label: 'Reports', href: '/admin/reports' }
+  ]
+
   useEffect(() => {
+    loadCurrentUser()
     loadUsers()
   }, [filter])
 
-  const loadUsers = async () => {
+  const loadCurrentUser = async () => {
     try {
-      setLoading(true)
-      const supabase = createClient()
-
-      // Check if current user is super admin
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser()
       if (!user) {
         router.push('/login')
         return
       }
-
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (profile?.role !== 'super_admin') {
-        router.push('/unauthorized')
+      const profile = await getUserProfile(user.id)
+      if (!profile) {
+        router.push('/profile/setup')
         return
       }
+      setCurrentUser(user)
+      setCurrentProfile(profile)
+    } catch (err) {
+      console.error('Error loading user:', err)
+      router.push('/login')
+    }
+  }
 
-      // Fetch all users with their profiles
-      const { data: usersData, error: usersError } = await supabase
-        .from('user_profiles')
-        .select(`
-          *,
-          organizations (
-            name,
-            slug
-          )
-        `)
-        .order('created_at', { ascending: false })
-
-      if (usersError) throw usersError
-
-      // Get auth users to check email confirmation
-      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers()
+  const loadUsers = async () => {
+    try {
+      setLoading(true)
       
-      if (authError) {
-        console.error('Auth users error:', authError)
+      // Fetch users from API route
+      const response = await fetch('/api/admin/users')
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to load users')
       }
 
-      // Merge auth data with profile data
-      const mergedUsers = usersData.map(profile => {
-        const authUser = authUsers?.find(au => au.id === profile.id)
-        return {
-          ...profile,
-          email: authUser?.email || 'N/A',
-          email_confirmed: authUser?.email_confirmed_at ? true : false,
-          last_sign_in: authUser?.last_sign_in_at
-        }
-      })
+      const data = await response.json()
+      const allUsers = data.users || []
 
       // Apply filter
-      let filteredUsers = mergedUsers
+      let filteredUsers = allUsers
       if (filter === 'pending') {
-        filteredUsers = mergedUsers.filter(u => !u.email_confirmed)
+        filteredUsers = allUsers.filter(u => !u.email_confirmed)
       } else if (filter === 'approved') {
-        filteredUsers = mergedUsers.filter(u => u.email_confirmed)
+        filteredUsers = allUsers.filter(u => u.email_confirmed)
       }
 
       setUsers(filteredUsers)
@@ -102,16 +97,24 @@ export default function SuperAdminUsersPage() {
         body: JSON.stringify({ userId })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to confirm email')
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json()
+          throw new Error(data.error || 'Failed to confirm email')
+        } else {
+          const text = await response.text()
+          console.error('Non-JSON response:', text)
+          throw new Error(`Failed to confirm email (${response.status})`)
+        }
       }
 
+      const data = await response.json()
       setMessage(`Email confirmed for ${email}`)
       loadUsers() // Reload users
     } catch (err) {
-      setError(err.message)
+      console.error('Confirm email error:', err)
+      setError(err.message || 'Failed to confirm email')
     }
   }
 
@@ -132,25 +135,33 @@ export default function SuperAdminUsersPage() {
         body: JSON.stringify({ userId })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete user')
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json()
+          throw new Error(data.error || 'Failed to delete user')
+        } else {
+          const text = await response.text()
+          console.error('Non-JSON response:', text)
+          throw new Error(`Failed to delete user (${response.status})`)
+        }
       }
 
+      const data = await response.json()
       setMessage(`User ${email} deleted successfully`)
       loadUsers()
     } catch (err) {
-      setError(err.message)
+      console.error('Delete user error:', err)
+      setError(err.message || 'Failed to delete user')
     }
   }
 
-  if (loading) {
+  if (loading || !currentProfile) {
     return <LoadingSpinner />
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <DashboardLayout user={currentUser} profile={currentProfile} navigation={navigation}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -303,6 +314,6 @@ export default function SuperAdminUsersPage() {
           </table>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   )
 }

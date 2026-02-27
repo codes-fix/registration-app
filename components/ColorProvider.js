@@ -8,10 +8,20 @@ export default function ColorProvider({ children }) {
 
   useEffect(() => {
     // Inject CSS custom properties into the document root
-    document.documentElement.style.setProperty('--color-primary', colors.primary)
-    document.documentElement.style.setProperty('--color-secondary', colors.secondary)
-    document.documentElement.style.setProperty('--color-accent', colors.accent)
+    if (colors.primary) {
+      document.documentElement.style.setProperty('--color-primary', colors.primary)
+      console.log('Updated primary color:', colors.primary)
+    }
+    if (colors.secondary) {
+      document.documentElement.style.setProperty('--color-secondary', colors.secondary)
+      console.log('Updated secondary color:', colors.secondary)
+    }
+    if (colors.accent) {
+      document.documentElement.style.setProperty('--color-accent', colors.accent)
+      console.log('Updated accent color:', colors.accent)
+    }
   }, [colors])
 
   return <>{children}</>
 }
+

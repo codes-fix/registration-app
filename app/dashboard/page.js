@@ -29,6 +29,19 @@ export default function DashboardPage() {
           return
         }
 
+        // Check if management user needs approval
+        if (userProfile.role === 'management') {
+          // Check email confirmation status from auth.users
+          const { createClient } = await import('@/lib/supabase/client')
+          const supabase = createClient()
+          const { data: { user: authUser } } = await supabase.auth.getUser()
+          
+          if (!authUser?.email_confirmed_at) {
+            router.push('/pending-approval')
+            return
+          }
+        }
+
         setUser(currentUser)
         setProfile(userProfile)
       } catch (error) {

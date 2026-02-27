@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getCurrentUser, updatePassword, signOut, getUserProfile } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/client'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { triggerColorUpdate } from '@/lib/hooks/useColors'
 
 
 export default function SettingsPage() {
@@ -273,6 +274,8 @@ export default function SettingsPage() {
     setMessage('')
 
     try {
+      console.log('Updating colors with:', siteColors)
+      
       const response = await fetch('/api/admin/site-settings', {
         method: 'PUT',
         headers: {
@@ -286,7 +289,16 @@ export default function SettingsPage() {
         throw new Error(error.error || 'Failed to update colors')
       }
 
-      setMessage('Site colors updated successfully! Refresh the page to see changes.')
+      const result = await response.json()
+      console.log('Colors updated successfully:', result)
+
+      // Wait a bit for the database to update
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      // Trigger color update event to refresh colors across the app
+      triggerColorUpdate()
+
+      setMessage('Site colors updated successfully!')
       setTimeout(() => setMessage(''), 5000)
     } catch (err) {
       console.error('Color update error:', err)
